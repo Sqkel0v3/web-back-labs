@@ -12,13 +12,14 @@ def web():
     return """<!doctype html>
         <html>
            <body>
-               <h1>web-сервер на flask</h1>
+           <h1>web-сервер на flask</h1>
                <a href="/author">author</a>
-           </body>
-        </html>""", 200, {
-            'X-Server': 'sample',
-            'Content-Type': 'text/plain; charset=utf-8'
-        }
+               <br>
+               <a href="/counter">счетчик</a>
+               <br>
+               <a href="/lab1/image">изображение с CSS</a>
+            </body>
+        </html>"""
 
 @app.route("/author")
 def author():
@@ -38,12 +39,15 @@ def author():
 
 @app.route('/lab1/image')
 def image():
-    path = url_for("static", filename ="oak.jpg")
+    path = url_for("static", filename="oak.jpg")
+    css_path = url_for("static", filename="lab1.css")
     return """<!doctype html>
         <html>
             <body>
                 <h1>Дуб</h1>
-                <img src=\"""" + path + """\" alt="Дуб" style="max-width: 600px; border: 2px solid black;">
+                <img src=\"""" + path + """\" class="oak-image">
+                <br>
+                <a href="/" class="back-link">На главную</a>
             </body>
         </html>"""
 
