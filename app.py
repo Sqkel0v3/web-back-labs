@@ -114,7 +114,7 @@ def lab1():
     return """<!doctype html>
 <html>
 <head>
-    <title>Первая лабораторная</title>
+    <title>Лабораторная 1</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -183,6 +183,28 @@ def lab1():
         .back-link:hover {
             background: #7f8c8d;
         }
+        .content {
+            margin: 20px 0;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        .home-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .home-link:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -191,8 +213,17 @@ def lab1():
         
         <header>
             <h1>Первая лабораторная работа</h1>
-            <p>Файлы первой лабораторной</p>
+            <p>Изучение основ Flask</p>
         </header>
+        
+        <div class="content">
+            <p>Flask — фреймворк для создания веб-приложений на языке
+            программирования Python, использующий набор инструментов
+            Werkzeug, а также шаблонизатор Jinja2. Относится к категории так
+            называемых микрофреймворков — минималистичных каркасов
+            веб-приложений, сознательно предоставляющих лишь самые ба-
+            зовые возможности.</p>
+        </div>
         
         <nav>
             <ul>
@@ -204,6 +235,8 @@ def lab1():
                 <li><a href="/lab1/clear_counter">отчистка счетчика</a></li>
             </ul>
         </nav>
+        
+        <a href="/" class="home-link">На главную страницу</a>
     </div>
 </body>
 </html>"""
