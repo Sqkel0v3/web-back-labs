@@ -1,4 +1,5 @@
-from flask import Flask, url_for
+from flask import Flask, url_for, request
+import datetime
 app = Flask(__name__)
 
 @app.route("/")
@@ -45,12 +46,21 @@ count = 0
 def counter():
     global count
     count += 1
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    url = request.url
+    client_ip = request.remote_addr
+
     return '''
 <!doctype html>
 <html>
     <body>
+        <h2>Счетчик посещений</h2>
         Сколько раз вы сюда заходили: ''' + str(count) + '''
-    </body>
+        <hr>
+        Дата и время: ''' + time + ''' <br>
+        Запрошенный адрес: ''' + url + ''' <br>
+        Ваш IP-адрес: ''' + client_ip + ''' <br>
+   </body>
 </html>
 '''
 
