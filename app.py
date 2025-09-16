@@ -1,15 +1,49 @@
-from flask import Flask, url_for, request, redirect
+from flask import Flask, url_for, request, redirect, session
 import datetime
 app = Flask(__name__)
+app.secret_key = 'your-secret-key-here'
+
+error_404_log = []
 
 @app.errorhandler(404)
 def not_found(err):
-    return """<!doctype html>
+    # Получаем информацию о текущем запросе
+    client_ip = request.remote_addr
+    current_time = datetime.datetime.now()
+    requested_url = request.url
+    user_agent = request.headers.get('User-Agent', 'Неизвестный')
+    
+    # Добавляем запись в лог
+    log_entry = {
+        'timestamp': current_time,
+        'ip': client_ip,
+        'url': requested_url,
+        'user_agent': user_agent
+    }
+    error_404_log.append(log_entry)
+    
+    # Ограничиваем лог последними 20 записями
+    if len(error_404_log) > 20:
+        error_404_log.pop(0)
+    
+    # Форматируем журнал для отображения
+    journal_html = ""
+    for entry in reversed(error_404_log[-10:]):  # Показываем последние 10 записей
+        formatted_time = entry['timestamp'].strftime("%Y-%m-%d %H:%M:%S")
+        journal_html += f"""
+        <div class="log-entry">
+            <span class="log-time">[{formatted_time}]</span>
+            <span class="log-ip">пользователь {entry['ip']}</span>
+            <span class="log-url">зашёл на адрес: {entry['url']}</span>
+        </div>
+        """
+    
+    return f"""<!doctype html>
 <html>
 <head>
     <title>404 - Страница не найдена</title>
     <style>
-        body {
+        body {{
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
@@ -19,46 +53,109 @@ def not_found(err):
             align-items: center;
             justify-content: center;
             color: #333;
-        }
-        .container {
+        }}
+        .container {{
             background: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             text-align: center;
-            max-width: 700px;
+            max-width: 900px;
             margin: 20px;
             backdrop-filter: blur(10px);
-        }
-        .error-code {
+        }}
+        .error-code {{
             font-size: 120px;
             font-weight: bold;
             color: #ff6b6b;
             margin: 0;
             text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        h1 {
+        }}
+        h1 {{
             color: #2c3e50;
             margin: 10px 0 20px 0;
             font-size: 2.5em;
-        }
-        p {
+        }}
+        p {{
             font-size: 1.2em;
             line-height: 1.6;
             color: #555;
             margin-bottom: 30px;
-        }
-        .emoji {
+        }}
+        .info-section {{
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-left: 5px solid #74b9ff;
+        }}
+        .info-section h3 {{
+            color: #2d3436;
+            margin-top: 0;
+            border-bottom: 2px solid #74b9ff;
+            padding-bottom: 10px;
+        }}
+        .info-item {{
+            margin: 10px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #ffeaa7;
+        }}
+        .info-label {{
+            font-weight: bold;
+            color: #2c3e50;
+        }}
+        .journal-section {{
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }}
+        .journal-section h3 {{
+            color: #ffeaa7;
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ffeaa7;
+            padding-bottom: 10px;
+        }}
+        .log-entry {{
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }}
+        .log-time {{
+            color: #74b9ff;
+        }}
+        .log-ip {{
+            color: #ffeaa7;
+            margin: 0 10px;
+        }}
+        .log-url {{
+            color: #a29bfe;
+        }}
+        .emoji {{
             font-size: 80px;
             margin: 20px 0;
             animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
-        .home-button {
+        }}
+        @keyframes bounce {{
+            0%, 20%, 50%, 80%, 100% {{transform: translateY(0);}}
+            40% {{transform: translateY(-20px);}}
+            60% {{transform: translateY(-10px);}}
+        }}
+        .home-button {{
             display: inline-block;
             padding: 15px 30px;
             background: linear-gradient(45deg, #ff6b6b, #ee5a52);
@@ -69,13 +166,14 @@ def not_found(err):
             font-size: 1.1em;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-        .home-button:hover {
+            margin: 10px;
+        }}
+        .home-button:hover {{
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
             background: linear-gradient(45deg, #ee5a52, #ff6b6b);
-        }
-        .search-icon {
+        }}
+        .search-icon {{
             width: 100px;
             height: 100px;
             margin: 20px auto;
@@ -87,29 +185,29 @@ def not_found(err):
             font-size: 40px;
             color: #ff6b6b;
             box-shadow: 0 5px 15px rgba(255, 234, 167, 0.5);
-        }
-        .advice {
+        }}
+        .advice {{
             background: #f8f9fa;
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
             border-left: 5px solid #74b9ff;
-        }
-        .advice h3 {
+        }}
+        .advice h3 {{
             color: #2d3436;
             margin-top: 0;
-        }
-        .image-container {
+        }}
+        .image-container {{
             margin: 40px 0;
-        }
-        .image-container img {
+        }}
+        .image-container img {{
             width: 450px;
             height: 300px;
             object-fit: cover;
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             border: 5px solid #fff;
-        }
+        }}
     </style>
 </head>
 <body>
@@ -117,6 +215,22 @@ def not_found(err):
         <div class="error-code">404</div>
         <div class="emoji">🔍</div>
         <h1>Ой! Кажется, мы потерялись...</h1>
+
+        <div class="info-section">
+            <h3>Информация о запросе</h3>
+            <div class="info-item">
+                <span class="info-label">Ваш IP-адрес:</span> {client_ip}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Дата и время:</span> {current_time.strftime('%Y-%m-%d %H:%M:%S')}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Запрошенный адрес:</span> {requested_url}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Браузер:</span> {user_agent}
+            </div>
+        </div>
 
         <div class="image-container">
             <img src="/static/kotik.jpg" alt="Милый котик">
@@ -134,6 +248,11 @@ def not_found(err):
         </div>
         
         <a href="/" class="home-button">Вернуться домой</a>
+
+        <div class="journal-section">
+            <h3> Журнал 404 ошибок</h3>
+            {journal_html if journal_html else '<div class="log-entry">Пока нет записей в журнале</div>'}
+        </div>
 
     </div>
 </body>
