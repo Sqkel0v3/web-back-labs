@@ -895,7 +895,9 @@ def author():
 def image():
     path = url_for("static", filename="oak.jpg")
     css_path = url_for("static", filename="lab1.css")
-    return """<!doctype html>
+    
+    response = """
+    <!doctype html>
         <html>
             <body>
                 <h1>Дуб</h1>
@@ -904,6 +906,16 @@ def image():
                 <a href="/" class="back-link">На главную</a>
             </body>
         </html>"""
+    
+    from flask import make_response
+    resp = make_response(response)
+    
+    resp.headers['Content-Language'] = 'ru'
+    
+    resp.headers['X-Custom-Header-1'] = 'My-Custom-Value-1'
+    resp.headers['X-Application-Name'] = 'Flask-Lab-Work'
+    
+    return resp
 
 count = 0
 
