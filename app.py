@@ -139,6 +139,156 @@ def not_found(err):
 </body>
 </html>""", 404
 
+from flask import render_template_string
+
+@app.route("/error/500")
+def cause_error():
+    result = 10 / 0
+    return "Этот код никогда не выполнится"
+
+@app.errorhandler(500)
+def internal_server_error(err):
+    error_message = str(err) if err else "Внутренняя ошибка сервера"
+    
+    return render_template_string("""
+<!doctype html>
+<html>
+<head>
+    <title>500 - Ошибка сервера</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 700px;
+            margin: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 0;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 10px 0 20px 0;
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .error-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #74b9ff;
+            text-align: left;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .emoji {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            25% {transform: translateX(-5px);}
+            75% {transform: translateX(5px);}
+        }
+        .home-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+        }
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        .support-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #f19066, #f5cd79);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(241, 144, 102, 0.4);
+            margin: 10px;
+        }
+        .support-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(241, 144, 102, 0.6);
+        }
+        .advice {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #74b9ff;
+        }
+        .advice h3 {
+            color: #2d3436;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">500</div>
+        <h1>Упс! Что-то пошло не так</h1>
+        
+        <p>На сервере произошла непредвиденная ошибка. Наша команда уже уведомлена и работает над решением проблемы.</p>
+        
+        <div class="error-details">
+            <strong>Детали ошибки:</strong><br>
+            {{ error_message }}
+        </div>
+        
+        <div class="advice">
+            <h3>Что можно сделать?</h3>
+            <p>• Попробуйте обновить страницу через несколько минут<br>
+               • Вернитесь на главную страницу<br>
+               • Если проблема повторяется, свяжитесь с поддержкой</p>
+        </div>
+        
+        <div>
+            <a href="/" class="home-button">Вернуться на главную</a>
+        </div>
+    </div>
+</body>
+</html>
+""", error_message=error_message), 500
+
 count = 0
 
 @app.route("/")
