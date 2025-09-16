@@ -488,6 +488,31 @@ def lab1():
         .home-link:hover {
             background: #2980b9;
         }
+        .routes-section {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2c3e50;
+        }
+        .routes-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .routes-list li {
+            margin: 8px 0;
+        }
+        .routes-list a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .routes-list a:hover {
+            background-color: #3498db;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -518,6 +543,28 @@ def lab1():
                 <li><a href="/lab1/clear_counter">отчистка счетчика</a></li>
             </ul>
         </nav>
+        
+        <div class="routes-section">
+            <h2>Список роутов</h2>
+            <ul class="routes-list">
+                <li><a href="/">/ (главная страница)</a></li>
+                <li><a href="/index">/index (главная страница)</a></li>
+                <li><a href="/lab1">/lab1 (первая лабораторная)</a></li>
+                <li><a href="/lab1/web">/lab1/web (web-страница)</a></li>
+                <li><a href="/lab1/author">/lab1/author (автор)</a></li>
+                <li><a href="/lab1/image">/lab1/image (картинка)</a></li>
+                <li><a href="/lab1/counter">/lab1/counter (счетчик)</a></li>
+                <li><a href="/lab1/info">/lab1/info (информация)</a></li>
+                <li><a href="/lab1/clear_counter">/lab1/clear_counter (очистка счетчика)</a></li>
+                <li><a href="/error/400">/error/400 (ошибка 400)</a></li>
+                <li><a href="/error/401">/error/401 (ошибка 401)</a></li>
+                <li><a href="/error/402">/error/402 (ошибка 402)</a></li>
+                <li><a href="/error/403">/error/403 (ошибка 403)</a></li>
+                <li><a href="/error/405">/error/405 (ошибка 405)</a></li>
+                <li><a href="/error/418">/error/418 (ошибка 418)</a></li>
+                <li><a href="/error/500">/error/500 (ошибка 500)</a></li>
+            </ul>
+        </div>
         
         <a href="/" class="home-link">На главную страницу</a>
     </div>
