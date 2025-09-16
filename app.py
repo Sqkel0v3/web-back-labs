@@ -4,7 +4,140 @@ app = Flask(__name__)
 
 @app.errorhandler(404)
 def not_found(err):
-    return "нет такой страницы", 404
+    return """<!doctype html>
+<html>
+<head>
+    <title>404 - Страница не найдена</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 700px;
+            margin: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 0;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 10px 0 20px 0;
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .emoji {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        .home-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+            background: linear-gradient(45deg, #ee5a52, #ff6b6b);
+        }
+        .search-icon {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background: #ffeaa7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #ff6b6b;
+            box-shadow: 0 5px 15px rgba(255, 234, 167, 0.5);
+        }
+        .advice {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #74b9ff;
+        }
+        .advice h3 {
+            color: #2d3436;
+            margin-top: 0;
+        }
+        .image-container {
+            margin: 40px 0;
+        }
+        .image-container img {
+            width: 450px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border: 5px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">404</div>
+        <div class="emoji">🔍</div>
+        <h1>Ой! Кажется, мы потерялись...</h1>
+
+        <div class="image-container">
+            <img src="/static/kotik.jpg" alt="Милый котик">
+        </div>
+        
+        <div class="search-icon">
+            ❓
+        </div>
+        
+        <div class="advice">
+            <h3>Что можно сделать?</h3>
+            <p>• Проверьте адрес страницы<br>
+               • Вернитесь на главную<br>
+               • Или просто наслаждайтесь видом этой красивой ошибки </p>
+        </div>
+        
+        <a href="/" class="home-button">Вернуться домой</a>
+
+    </div>
+</body>
+</html>""", 404
 
 count = 0
 
