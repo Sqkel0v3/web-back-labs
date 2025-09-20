@@ -1,21 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иван Иванов. Лабораторная работа 2</title>
+    <title>{{ name }}. Лабораторная работа {{ lab_number }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
     <header>
-        WEB-программирование, часть 2. Лабораторная работа 2
+        WEB-программирование, часть 2. Лабораторная работа {{ lab_number }}
     </header>
 
     <main>
-        основной контент
+        <h2>Вычисления:</h2>
+        <ul>
+            <li>11 × 28 = {{ 11 * 28 }}</li>
+            <li>3258 - 759 = {{ 3258 - 759 }}</li>
+            <li>8452 / 793 = {{ "%.2f"|format(8452 / 793) }}</li>
+            <li>45<sup>8</sup> = {{ 45**8 }}</li>
+        </ul>
     </main>
 
     <footer>
-        &соpу; Фомченко Роман Дмитриевич, ФБИ-34, 3 курс, 2025
+        &copy; {{ name }}, {{ group }}, {{ course }}, 2025
     </footer>
 </body>
 </html>
