@@ -23,6 +23,59 @@
             <li>8452 / 793 = {{ "%.2f"|format(8452 / 793) }}</li>
             <li>45<sup>8</sup> = {{ 45**8 }}</li>
         </ul>
+
+        <h2>Список фруктов:</h2>
+        
+        {% if fruits is defined and fruits %}
+            <h3>Простой список:</h3>
+            <ul>
+                {% for f in fruits %}
+                <li>{{ f.name }} - {{ f.price }} &#8381;</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Детализированный список:</h3>
+            <ul>
+                {% for f in fruits %}
+                <li>
+                    {{ loop.index }}. {{ f.name }} - {{ f.price }} &#8381;
+                    {% if loop.first %} (Первый в списке){% endif %}
+                    {% if loop.last %} (Последний в списке){% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Таблица фруктов:</h3>
+            <table border="1" cellpadding="8">
+                <tr>
+                    <th>№</th>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Примечание</th>
+                </tr>
+                {% for f in fruits %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ f.name }}</td>
+                    <td>{{ f.price }} &#8381;</td>
+                    <td>
+                        {% if loop.first %}Самый первый{% endif %}
+                        {% if loop.last %}Самый последний{% endif %}
+                        {% if not loop.first and not loop.last %}-{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <!-- Информация о цикле -->
+            <h3>Информация о цикле:</h3>
+            <p>Всего фруктов: {{ fruits|length }}</p>
+
+        {% elif fruits is defined %}
+            <p>Список фруктов пуст</p>
+        {% else %}
+            <p>Информация о фруктах не предоставлена</p>
+        {% endif %}
     </main>
 
     <footer>
