@@ -1168,11 +1168,45 @@ def add_flower(name):
 </html>
 '''
 
+@app.route('/lab2/example/minimal')
+def example_minimal():
+    return render_template('example.html',
+                         lab_number=2)
+
+@app.route('/lab2/example/empty')
+def example_empty():
+    # Пустой список фруктов
+    fruits = []
+    return render_template('example.html',
+                         fruits=fruits,  
+                         name='Тест',
+                         lab_num=2,
+                         group='ТЕСТ',
+                         course=1)
+
+@app.route('/lab2/example/<int:lab_number>')
+@app.route('/lab2/example/<int:lab_number>/<name>')
+@app.route('/lab2/example/<int:lab_number>/<name>/<group>/<course>')
+def example_flexible(lab_number, name=None, group=None, course=None):
+    return render_template('example.html',
+                         name=name,
+                         lab_number=lab_number,
+                         group=group,
+                         course=course)
+
 @app.route('/lab2/example')
 def example():
-    name = 'Фомченко Роман'
-    lab_number = 2
-    group = 'Ваша группа'  
-    course = 'Ваш курс'
-    
-    return render_template('example.html', name=name, lab_number=lab_number, group=group, course=course)
+    name, lab_number, group, course = 'Иван Иванов', 2, 'ФБИ-00', 3
+    fruits = [
+        {'name': 'яблоки', 'price': 100},
+        {'name': 'груши', 'price': 120},
+        {'name': 'апельсины', 'price': 80},
+        {'name': 'мандарины', 'price': 95},
+        {'name': 'манго', 'price': 321}
+    ]
+    return render_template('example.html',
+                         name=name,
+                         lab_number=lab_number,
+                         group=group,
+                         course=course,
+                         fruits=fruits)  
