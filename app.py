@@ -1,4 +1,4 @@
-from flask import Flask, url_for, request, redirect, session
+from flask import Flask, url_for, request, redirect, session, abort
 import datetime
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
@@ -1150,3 +1150,13 @@ def a():
 @app.route('/lab2/a')
 def a2():
     return 'без слеша'
+
+flower_list = ('роза', 'тюльпан', 'незабудка', 'ромашка')
+
+@app.route('/lab2/flowers/<int:flower_id>')
+def flowers(flower_id):
+    if flower_id >= len(flower_list):
+        abort(404)
+    else:
+        return "цветок: " + flower_list[flower_id]
+    
