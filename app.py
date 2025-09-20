@@ -1142,3 +1142,11 @@ def created():
     </body>
 </html>
 ''', 201
+
+@app.route('/lab2/a/')
+def a():
+    return 'со слешем'
+
+@app.route('/lab2/a')
+def a2():
+    return 'без слеша'
