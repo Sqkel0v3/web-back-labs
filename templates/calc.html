@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 2{% endblock %}
+
+{% block main %}
+    <h1>Калькулятор</h1>
+    <p>Расчёт с параметрами:</p>
+    
+    <div>{{ a }} + {{ b }} = {{ operations['суммирование'] }}</div>
+    <div>{{ a }} - {{ b }} = {{ operations['вычитание'] }}</div>
+    <div>{{ a }} × {{ b }} = {{ operations['умножение'] }}</div>
+    <div>{{ a }} / {{ b }} = {{ operations['деление'] }}</div>
+    <div>{{ a }}^{{ b }} = {{ operations['возведение в степень'] }}</div>
+    
+    <p><a href="/lab2/calc/">Вернуться к калькулятору</a></p>
+{% endblock %}
