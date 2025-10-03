@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 2{% endblock %}
+
+{% block main %}
+    <h1>Каталог ягод</h1>
+    <p>Всего ягод в каталоге: {{ berries|length }}</p>
+    
+    <div class="berries-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+        {% for berry in berries %}
+        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; background-color: #f9f9f9;">
+            <div style="height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <img src="{{ url_for('static', filename='kartinki/' + berry.image) }}" 
+                     alt="{{ berry.name }}" 
+                     style="max-height: 180px; max-width: 100%; border-radius: 5px;">
+            </div>
+            <h3 style="margin: 10px 0; color: #2c3e50;">{{ berry.name }}</h3>
+            <p style="color: #666; font-size: 14px; line-height: 1.4;">{{ berry.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 30px; padding: 15px; background-color: #e8f5e8; border-radius: 5px;">
+    </div>
+{% endblock %}
