@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 2{% endblock %}
+
+{% block main %}
+    <h1>Список цветов</h1>
+    <p>Общее количество цветов: {{ flowers|length }}</p>
+
+    <div class="flowers-list" style="margin: 20px 0;">
+        {% if flowers %}
+            <ol>
+                {% for flower in flowers %}
+                <li style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    <strong>{{ flower.name }}</strong> - {{ flower.price }} руб 
+                    <a href="{{ url_for('del_flower', flower_id=loop.index0) }}" 
+                       style="margin-left: 15px; color: #e74c3c; text-decoration: none;"
+                       onclick="return confirm('Удалить {{ flower.name }}?')">
+                       удалить
+                    </a>
+                </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p style="color: #7f8c8d; font-style: italic;">Цветов нет</p>
+        {% endif %}
+    </div>
+
+    <div style="margin: 30px 0; padding: 20px; background: #e8f4f8; border-radius: 8px;">
+        <h3>Добавить цветок:</h3>
+        <form action="{{ url_for('add_flower_manual') }}" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="name" placeholder="Название цветка" 
+                   style="padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; flex: 1;">
+            <button type="submit" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                добавить
+            </button>
+        </form>
+
+    </div>
+
+    <div style="margin: 20px 0;">
+        <a href="{{ url_for('clear_flowers') }}" 
+           style="display: inline-block; padding: 10px 20px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px;"
+           onclick="return confirm('Удалить ВСЕ цветы?')">
+           <strong>Удалить все цветы</strong>
+        </a>
+    </div>
+
+{% endblock %}
