@@ -1,15 +1,37 @@
 {% extends "base.html" %}
 
-{# номер лабораторной работы: #}
 {% block lab %}Лабораторная работа 2{% endblock %}
 
-{# основной контент: #}
 {% block main %}
-    <h1>Шаблоны</h1>
-    <div>Тема лабораторной - шаблоны. Список сделанных страниц:</div>
-    <ol>
-        <li>
-            <a href="/lab2/example">example</a>
-        </li>
-    </ol>
+    <h1>Вторая лабораторная работа</h1>
+    <p>Тема лабораторной - шаблоны. Список сделанных страниц:</p>
+    
+    <nav>
+        <ul>
+            <li><a href="/lab2/example">Example</a></li>
+            <li><a href="/lab2/filters">Фильтры</a></li>
+            <li><a href="/lab2/books">Список книг</a></li>
+            <li><a href="/lab2/calc/">Калькулятор</a></li>
+            <li><a href="/lab2/berries">Каталог ягод</a></li>
+            <li><a href="/lab2/all_flowers">Цветы</a></li>
+        </ul>
+    </nav>
+
+    <div class="routes-section">
+        <h2>Список роутов второй лабораторной</h2>
+        <ul class="routes-list">
+            <li><a href="/lab2">/lab2 (вторая лабораторная)</a></li>
+            <li><a href="/lab2/example">/lab2/example (пример)</a></li>
+            <li><a href="/lab2/filters">/lab2/filters (фильтры)</a></li>
+            <li><a href="/lab2/books">/lab2/books (список книг)</a></li>
+            <li><a href="/lab2/calc/">/lab2/calc/ (калькулятор)</a></li>
+            <li><a href="/lab2/calc/5">/lab2/calc/5 (калькулятор с одним числом)</a></li>
+            <li><a href="/lab2/calc/3/4">/lab2/calc/3/4 (калькулятор с двумя числами)</a></li>
+            <li><a href="/lab2/berries">/lab2/berries (каталог ягод)</a></li>
+            <li><a href="/lab2/all_flowers">/lab2/all_flowers (все цветы)</a></li>
+            <li><a href="/lab2/flowers/0">/lab2/flowers/0 (первый цветок)</a></li>
+            <li><a href="/lab2/add_flower/роза">/lab2/add_flower/роза (добавить цветок)</a></li>
+            <li><a href="/lab2/clear_flowers">/lab2/clear_flowers (очистить цветы)</a></li>
+        </ul>
+    </div>
 {% endblock %}
