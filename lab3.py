@@ -207,3 +207,93 @@ def clear_settings():
     resp.delete_cookie('bg_color')
     resp.delete_cookie('font_size')
     return resp
+
+phones = [
+    {'id': 1, 'name': 'iPhone 15 Pro', 'brand': 'Apple', 'price': 99990, 'color': 'Титановый', 'storage': '256GB'},
+    {'id': 2, 'name': 'Samsung Galaxy S24', 'brand': 'Samsung', 'price': 79990, 'color': 'Черный', 'storage': '256GB'},
+    {'id': 3, 'name': 'Xiaomi 14', 'brand': 'Xiaomi', 'price': 59990, 'color': 'Белый', 'storage': '256GB'},
+    {'id': 4, 'name': 'Google Pixel 8 Pro', 'brand': 'Google', 'price': 89990, 'color': 'Бирюзовый', 'storage': '128GB'},
+    {'id': 5, 'name': 'OnePlus 12', 'brand': 'OnePlus', 'price': 64990, 'color': 'Зеленый', 'storage': '256GB'},
+    {'id': 6, 'name': 'iPhone 14', 'brand': 'Apple', 'price': 69990, 'color': 'Синий', 'storage': '128GB'},
+    {'id': 7, 'name': 'Samsung Galaxy A54', 'brand': 'Samsung', 'price': 34990, 'color': 'Фиолетовый', 'storage': '128GB'},
+    {'id': 8, 'name': 'Xiaomi Redmi Note 13', 'brand': 'Xiaomi', 'price': 24990, 'color': 'Черный', 'storage': '128GB'},
+    {'id': 9, 'name': 'Realme 11 Pro+', 'brand': 'Realme', 'price': 32990, 'color': 'Золотой', 'storage': '256GB'},
+    {'id': 10, 'name': 'iPhone 13 mini', 'brand': 'Apple', 'price': 54990, 'color': 'Розовый', 'storage': '128GB'},
+    {'id': 11, 'name': 'Samsung Galaxy Z Flip5', 'brand': 'Samsung', 'price': 119990, 'color': 'Сиреневый', 'storage': '256GB'},
+    {'id': 12, 'name': 'Google Pixel 7a', 'brand': 'Google', 'price': 44990, 'color': 'Коралловый', 'storage': '128GB'},
+    {'id': 13, 'name': 'Nothing Phone (2)', 'brand': 'Nothing', 'price': 52990, 'color': 'Белый', 'storage': '256GB'},
+    {'id': 14, 'name': 'Honor 90', 'brand': 'Honor', 'price': 37990, 'color': 'Изумрудный', 'storage': '256GB'},
+    {'id': 15, 'name': 'Motorola Edge 40', 'brand': 'Motorola', 'price': 41990, 'color': 'Черный', 'storage': '256GB'},
+    {'id': 16, 'name': 'iPhone 15 Plus', 'brand': 'Apple', 'price': 89990, 'color': 'Желтый', 'storage': '256GB'},
+    {'id': 17, 'name': 'Samsung Galaxy S23 FE', 'brand': 'Samsung', 'price': 54990, 'color': 'Кремовый', 'storage': '128GB'},
+    {'id': 18, 'name': 'Xiaomi Poco X6 Pro', 'brand': 'Xiaomi', 'price': 32990, 'color': 'Серый', 'storage': '256GB'},
+    {'id': 19, 'name': 'Asus Zenfone 10', 'brand': 'Asus', 'price': 59990, 'color': 'Красный', 'storage': '256GB'},
+    {'id': 20, 'name': 'Sony Xperia 5 V', 'brand': 'Sony', 'price': 84990, 'color': 'Синий', 'storage': '128GB'},
+    {'id': 21, 'name': 'iPhone SE (2022)', 'brand': 'Apple', 'price': 42990, 'color': 'Белый', 'storage': '64GB'},
+    {'id': 22, 'name': 'Samsung Galaxy A14', 'brand': 'Samsung', 'price': 14990, 'color': 'Серебристый', 'storage': '64GB'},
+    {'id': 23, 'name': 'Xiaomi Redmi 12', 'brand': 'Xiaomi', 'price': 15990, 'color': 'Голубой', 'storage': '128GB'},
+    {'id': 24, 'name': 'Nokia G42', 'brand': 'Nokia', 'price': 19990, 'color': 'Фиолетовый', 'storage': '128GB'}
+]
+
+@lab3.route('/lab3/search')
+def search():
+    min_price_cookie = request.cookies.get('min_price', '')
+    max_price_cookie = request.cookies.get('max_price', '')
+
+    min_price_form = request.args.get('min_price', '').strip()
+    max_price_form = request.args.get('max_price', '').strip()
+
+    if request.args.get('reset'):
+        min_price = ''
+        max_price = ''
+        filtered_phones = phones
+    else:
+        min_price = min_price_form if min_price_form != '' else min_price_cookie
+        max_price = max_price_form if max_price_form != '' else max_price_cookie
+
+        filtered_phones = filter_phones(phones, min_price, max_price)
+
+    total_count = len(phones)
+    filtered_count = len(filtered_phones)
+
+    all_prices = [phone['price'] for phone in phones]
+    min_all_price = min(all_prices)
+    max_all_price = max(all_prices)
+
+    resp = make_response(render_template('lab3/search.html',
+                                       phones=filtered_phones,
+                                       min_price=min_price,
+                                       max_price=max_price,
+                                       total_count=total_count,
+                                       filtered_count=filtered_count,
+                                       min_all_price=min_all_price,
+                                       max_all_price=max_all_price))
+    
+    if not request.args.get('reset'):
+        if min_price:
+            resp.set_cookie('min_price', min_price)
+        if max_price:
+            resp.set_cookie('max_price', max_price)
+    else:
+        resp.delete_cookie('min_price')
+        resp.delete_cookie('max_price')
+    
+    return resp
+
+def filter_phones(phones_list, min_price_str, max_price_str):
+    """Фильтрация телефонов по цене"""
+    filtered = phones_list.copy()
+    
+    try:
+        if min_price_str:
+            min_price = int(min_price_str)
+            filtered = [phone for phone in filtered if phone['price'] >= min_price]
+
+        if max_price_str:
+            max_price = int(max_price_str)
+            filtered = [phone for phone in filtered if phone['price'] <= max_price]
+            
+    except ValueError:
+        return phones_list
+    
+    return filtered
