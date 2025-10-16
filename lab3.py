@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request, make_response, redirect
+import random
+from datetime import datetime
 
 lab3 = Blueprint('lab3', __name__)
 
@@ -94,4 +96,114 @@ def settings():
     font_size = request.cookies.get('font_size')
     
     resp = make_response(render_template('lab3/settings.html', color=color or '#000000',bg_color=bg_color or '#ffffff', font_size=font_size or '16'))
+    return resp
+
+@lab3.route('/lab3/ticket')
+def ticket():
+    errors = {}
+    fio = request.args.get('fio')
+    shelf = request.args.get('shelf')
+    linen = request.args.get('linen')
+    luggage = request.args.get('luggage')
+    age = request.args.get('age')
+    departure = request.args.get('departure')
+    destination = request.args.get('destination')
+    date = request.args.get('date')
+    insurance = request.args.get('insurance')
+    
+    return render_template('lab3/ticket.html', fio=fio, shelf=shelf, linen=linen, luggage=luggage, age=age, departure=departure, destination=destination, date=date, insurance=insurance, errors=errors)
+
+@lab3.route('/lab3/ticket_result')
+def ticket_result():
+    errors = {}
+    
+    fio = request.args.get('fio', '').strip()
+    shelf = request.args.get('shelf', '').strip()
+    linen = request.args.get('linen')
+    luggage = request.args.get('luggage')
+    age_str = request.args.get('age', '').strip()
+    departure = request.args.get('departure', '').strip()
+    destination = request.args.get('destination', '').strip()
+    date = request.args.get('date', '').strip()
+    insurance = request.args.get('insurance')
+
+    if not fio:
+        errors['fio'] = 'Заполните ФИО пассажира'
+    
+    if not shelf:
+        errors['shelf'] = 'Выберите полку'
+    
+    if not age_str:
+        errors['age'] = 'Заполните возраст'
+    else:
+        try:
+            age = int(age_str)
+            if age < 1 or age > 120:
+                errors['age'] = 'Возраст должен быть от 1 до 120 лет'
+        except ValueError:
+            errors['age'] = 'Возраст должен быть числом'
+    
+    if not departure:
+        errors['departure'] = 'Заполните пункт выезда'
+    
+    if not destination:
+        errors['destination'] = 'Заполните пункт назначения'
+    
+    if not date:
+        errors['date'] = 'Выберите дату поездки'
+
+    if errors:
+        return render_template('lab3/ticket.html',
+                             fio=fio, shelf=shelf, linen=linen, luggage=luggage,
+                             age=age_str, departure=departure, destination=destination,
+                             date=date, insurance=insurance, errors=errors)
+    
+    age = int(age_str)
+
+    if age < 18:
+        base_price = 700  
+        ticket_type = "Детский билет"
+    else:
+        base_price = 1000  
+        ticket_type = "Взрослый билет"
+
+    additional_cost = 0
+    
+    if shelf in ['lower', 'side_lower']:
+        additional_cost += 100
+    
+    if linen == 'on':
+        additional_cost += 75
+
+    if luggage == 'on':
+        additional_cost += 250
+
+    if insurance == 'on':
+        additional_cost += 150
+    
+    total_price = base_price + additional_cost
+
+    shelf_names = {
+        'lower': 'Нижняя',
+        'upper': 'Верхняя',
+        'side_upper': 'Верхняя боковая',
+        'side_lower': 'Нижняя боковая'
+    }
+
+    ticket_number = f"{random.randint(100000, 999999)}"
+    
+    return render_template('lab3/ticket_result.html',
+                         fio=fio, shelf=shelf, linen=linen, luggage=luggage,
+                         age=age, departure=departure, destination=destination,
+                         date=date, insurance=insurance, ticket_type=ticket_type,
+                         shelf_name=shelf_names[shelf], total_price=total_price,
+                         ticket_number=ticket_number)
+
+@lab3.route('/lab3/clear_settings')
+def clear_settings():
+    """Очистка всех кук настроек"""
+    resp = make_response(redirect('/lab3/settings'))
+    resp.delete_cookie('color')
+    resp.delete_cookie('bg_color')
+    resp.delete_cookie('font_size')
     return resp

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<h1>Железнодорожный билет</h1>
+
+<div style="border: 2px solid #333; padding: 20px; max-width: 600px; margin: 0 auto;">
+    <h2>Билет №{{ ticket_number }}</h2>
+    
+    <div><strong>ФИО пассажира:</strong> {{ fio }}</div>
+    <div><strong>Тип билета:</strong> {{ ticket_type }}</div>
+    <div><strong>Возраст:</strong> {{ age }} лет</div>
+    <div><strong>Полка:</strong> {{ shelf_name }}</div>
+    <div><strong>Маршрут:</strong> {{ departure }} → {{ destination }}</div>
+    <div><strong>Дата поездки:</strong> {{ date }}</div>
+    
+    <div style="margin: 15px 0;">
+        <strong>Дополнительные услуги:</strong>
+        <ul>
+            {% if linen == 'on' %}<li>Бельё</li>{% endif %}
+            {% if luggage == 'on' %}<li>Багаж</li>{% endif %}
+            {% if insurance == 'on' %}<li>Страховка</li>{% endif %}
+        </ul>
+    </div>
+    
+    <div style="font-size: 1.2em; font-weight: bold; border-top: 1px solid #333; padding-top: 10px;">
+        Итоговая стоимость: {{ total_price }} руб.
+    </div>
+</div>
+
+<div style="margin-top: 20px;">
+    <a href="/lab3/ticket">Оформить новый билет</a>
+</div>
+{% endblock %}

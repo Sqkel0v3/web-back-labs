@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<h1>Железнодорожный билет</h1>
+
+<form action="/lab3/ticket_result">
+    <div>
+        <label for="fio">ФИО пассажира:</label>
+        <input type="text" id="fio" name="fio" value="{{ fio or '' }}">
+        <span class="error">{{ errors.fio }}</span>
+    </div>
+
+    <div>
+        <label>Полка:</label>
+        <select name="shelf">
+            <option value="lower" {{ shelf == 'lower' and 'selected' }}>Нижняя</option>
+            <option value="upper" {{ shelf == 'upper' and 'selected' }}>Верхняя</option>
+            <option value="side_upper" {{ shelf == 'side_upper' and 'selected' }}>Верхняя боковая</option>
+            <option value="side_lower" {{ shelf == 'side_lower' and 'selected' }}>Нижняя боковая</option>
+        </select>
+        <span class="error">{{ errors.shelf }}</span>
+    </div>
+
+    <div>
+        <label>
+            <input type="checkbox" name="linen" {{ linen == 'on' and 'checked' }}> С бельём
+        </label>
+    </div>
+
+    <div>
+        <label>
+            <input type="checkbox" name="luggage" {{ luggage == 'on' and 'checked' }}> С багажом
+        </label>
+    </div>
+
+    <div>
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age" value="{{ age or '' }}">
+        <span class="error">{{ errors.age }}</span>
+    </div>
+
+    <div>
+        <label for="departure">Пункт выезда:</label>
+        <input type="text" id="departure" name="departure" value="{{ departure or '' }}">
+        <span class="error">{{ errors.departure }}</span>
+    </div>
+
+    <div>
+        <label for="destination">Пункт назначения:</label>
+        <input type="text" id="destination" name="destination" value="{{ destination or '' }}">
+        <span class="error">{{ errors.destination }}</span>
+    </div>
+
+    <div>
+        <label for="date">Дата поездки:</label>
+        <input type="date" id="date" name="date" value="{{ date or '' }}">
+        <span class="error">{{ errors.date }}</span>
+    </div>
+
+    <div>
+        <label>
+            <input type="checkbox" name="insurance" {{ insurance == 'on' and 'checked' }}> Нужна страховка
+        </label>
+    </div>
+
+    <div>
+        <button type="submit">Рассчитать стоимость</button>
+        <a href="/lab3/ticket">Очистить форму</a>
+    </div>
+</form>
+{% endblock %}
