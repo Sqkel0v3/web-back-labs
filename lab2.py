@@ -129,12 +129,12 @@ def clear_flowers():
 
 @lab2.route('/lab2/example/minimal')
 def example_minimal():
-    return render_template('example.html', lab_number=2)
+    return render_template('lab2/example.html', lab_number=2)
 
 @lab2.route('/lab2/example/empty')
 def example_empty():
     fruits = []
-    return render_template('example.html',
+    return render_template('lab2/example.html',
                          fruits=fruits,  
                          name='Тест',
                          lab_number=2,
@@ -158,7 +158,7 @@ def example_flexible(lab_number, name=None, group=None, course=None):
         {'name': 'апельсины', 'price': 80}
     ]
     
-    return render_template('example.html',
+    return render_template('lab2/example.html',
                          name=name,
                          lab_number=lab_number,
                          group=group,
@@ -174,7 +174,7 @@ def example():
         {'name': 'мандарины', 'price': 95},
         {'name': 'манго', 'price': 321}
     ]
-    return render_template('example.html',
+    return render_template('lab2/example.html',
                          name='Фомченко Роман',
                          lab_number=2,
                          group='ФБИ-34',
@@ -184,7 +184,7 @@ def example():
 @lab2.route('/lab2/filters')
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase=phrase)
+    return render_template('lab2/filter.html', phrase=phrase)
 
 @lab2.route('/lab2/calc/')
 def calc_default():
@@ -204,7 +204,7 @@ def calc(a, b):
         'возведение в степень': a ** b
     }
     
-    return render_template('calc.html', a=a, b=b, operations=operations)
+    return render_template('lab2/calc.html', a=a, b=b, operations=operations)
 
 books = [
     {'author': 'Фёдор Достоевский', 'title': 'Преступление и наказание', 'genre': 'Роман', 'pages': 671},
@@ -223,7 +223,7 @@ books = [
 
 @lab2.route('/lab2/books')
 def books_list():
-    return render_template('books.html', books=books)
+    return render_template('lab2/books.html', books=books)
 
 berries = [
     {
@@ -350,7 +350,7 @@ berries = [
 
 @lab2.route('/lab2/berries')
 def berries_list():
-    return render_template('berries.html', berries=berries)
+    return render_template('lab2/berries.html', berries=berries)
 
 @lab2.route("/error/400")
 def error_400():
