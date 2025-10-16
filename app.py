@@ -522,4 +522,11 @@ def index():
 @app.route('/')
 @app.route('/start')
 def start():
-    return render_template('start.html')
+    return '''
+    <html>
+    <body>
+        <h1>Главная</h1>
+        <a href="/lab3/">Лабораторная 3</a>
+    </body>
+    </html>
+    '''
