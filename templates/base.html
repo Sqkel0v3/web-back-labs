@@ -12,8 +12,10 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: {{ request.cookies.get('bg_color', '#f5f5f5') }};
             line-height: 1.6;
+            color: {{ request.cookies.get('color', '#000000') }};
+            font-size: {{ request.cookies.get('font_size', '16') }}px;
         }
         .container {
             max-width: 1000px;

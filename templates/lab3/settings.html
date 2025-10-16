@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<h1>Настройки стилей</h1>
+
+<form>
+    <div>
+        <label for="color">Выберите цвет текста:</label>
+        <input type="color" id="color" name="color" value="{{ color }}">
+    </div>
+    
+    <div>
+        <label for="bg_color">Выберите цвет фона:</label>
+        <input type="color" id="bg_color" name="bg_color" value="{{ bg_color }}">
+    </div>
+    
+    <div>
+        <label for="font_size">Размер шрифта:</label>
+        <select id="font_size" name="font_size">
+            <option value="12" {{ font_size == '12' and 'selected' }}>Маленький (12px)</option>
+            <option value="16" {{ font_size == '16' and 'selected' }}>Средний (16px)</option>
+            <option value="20" {{ font_size == '20' and 'selected' }}>Большой (20px)</option>
+            <option value="24" {{ font_size == '24' and 'selected' }}>Очень большой (24px)</option>
+        </select>
+    </div>
+    
+    <div>
+        <button type="submit">Применить</button>
+    </div>
+</form>
+{% endblock %}
