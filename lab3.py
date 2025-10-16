@@ -199,11 +199,3 @@ def ticket_result():
                          shelf_name=shelf_names[shelf], total_price=total_price,
                          ticket_number=ticket_number)
 
-@lab3.route('/lab3/clear_settings')
-def clear_settings():
-    """Очистка всех кук настроек"""
-    resp = make_response(redirect('/lab3/settings'))
-    resp.delete_cookie('color')
-    resp.delete_cookie('bg_color')
-    resp.delete_cookie('font_size')
-    return resp
