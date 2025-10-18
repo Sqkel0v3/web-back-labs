@@ -13,6 +13,9 @@ app.register_blueprint(lab2)
 app.register_blueprint(lab3)
 app.register_blueprint(lab4)
 
+if __name__ == '__main__':
+    app.run(debug=True)
+
 error_404_log = []
 
 @app.errorhandler(404)
