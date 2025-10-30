@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block lab %}Редактирование профиля{% endblock %}
+
+{% block main %}
+    <h1>Редактирование профиля</h1>
+    
+    <form method="post">
+        <div style="margin-bottom: 15px;">
+            <label for="login">Логин:</label>
+            <input type="text" id="login" name="login" value="{{ user.login }}" required>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" name="name" value="{{ user.name }}" required>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="gender">Пол:</label>
+            <select id="gender" name="gender">
+                <option value="м" {% if user.gender == 'м' %}selected{% endif %}>Мужской</option>
+                <option value="ж" {% if user.gender == 'ж' %}selected{% endif %}>Женский</option>
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="password">Новый пароль (оставьте пустым, если не хотите менять):</label>
+            <input type="password" id="password" name="password">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="password_confirm">Подтверждение нового пароля:</label>
+            <input type="password" id="password_confirm" name="password_confirm">
+        </div>
+        
+        <div>
+            <button type="submit">Сохранить изменения</button>
+            <button type="reset">Сбросить</button>
+            <a href="/lab4/users" style="margin-left: 10px;">Отмена</a>
+        </div>
+    </form>
+
+    {% if error %}
+    <div style="color: #d32f2f; font-weight: bold; background-color: #ffebee; 
+                padding: 15px; border-radius: 5px; border: 1px solid #f44336; 
+                margin-top: 20px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div style="color: #2e7d32; font-weight: bold; background-color: #e8f5e8; 
+                padding: 15px; border-radius: 5px; border: 1px solid #4caf50; 
+                margin-top: 20px;">
+        {{ success }}
+        <p><a href="/lab4/users">Вернуться к списку пользователей</a></p>
+    </div>
+    {% endif %}
+{% endblock %}

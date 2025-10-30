@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block lab %}Список пользователей{% endblock %}
+
+{% block main %}
+    <h1>Список пользователей</h1>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="/lab4/edit_user" style="background-color: #2196f3; color: white; 
+               padding: 10px 15px; text-decoration: none; border-radius: 5px; 
+               margin-right: 10px;">Редактировать мои данные</a>
+        
+        <form action="/lab4/delete_user" method="post" style="display: inline;">
+            <button type="submit" style="background-color: #f44336; color: white; 
+                    padding: 10px 15px; border: none; border-radius: 5px; 
+                    cursor: pointer;">Удалить мой аккаунт</button>
+        </form>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f5f5f5;">
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Имя</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Логин</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Пол</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td style="padding: 12px; border: 1px solid #ddd;">
+                    {{ user.name }}
+                    {% if user.login == current_user %}
+                    <strong>(Вы)</strong>
+                    {% endif %}
+                </td>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ user.login }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">
+                    {% if user.gender == 'м' %}Мужской{% else %}Женский{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <p><a href="/lab4/">Вернуться в лабораторную</a></p>
+    </div>
+{% endblock %}
