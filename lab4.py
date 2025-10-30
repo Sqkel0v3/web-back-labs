@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, redirect, session
 lab4 = Blueprint('lab4', __name__)
 
 users = [
-    {'login': 'alex', 'password': '123'},
-    {'login': 'bob', 'password': '555'},
-    {'login': 'admin', 'password': 'admin'},
-    {'login': 'user', 'password': 'pass'}
+    {'login': 'alex', 'password': '123', 'name': 'Алексей Петров', 'gender': 'м'},
+    {'login': 'bob', 'password': '555', 'name': 'Боб Смит', 'gender': 'м'},
+    {'login': 'admin', 'password': 'admin', 'name': 'Администратор', 'gender': 'м'},
+    {'login': 'user', 'password': 'pass', 'name': 'Пользователь', 'gender': 'м'},
+    {'login': 'anna', 'password': 'anna', 'name': 'Анна Иванова', 'gender': 'ж'}
 ]
 
 @lab4.route('/lab4/')
@@ -141,14 +142,25 @@ def login():
     if request.method == 'GET':
         if 'login' in session:
             authorized = True
-            login = session['login']
+            user_name = ''
+            for user in users:
+                if user['login'] == session['login']:
+                    user_name = user['name']
+                    break
+            return render_template('lab4/login.html', authorized=authorized, name=user_name)
         else:
-            authorized = False
-            login = ''
-        return render_template('lab4/login.html', authorized=authorized, login=login)
+            return render_template('lab4/login.html', authorized=False)
     
     login = request.form.get('login')
     password = request.form.get('password')
+
+    if not login:
+        error = 'Не введён логин'
+        return render_template('lab4/login.html', error=error, authorized=False, login_value=login)
+    
+    if not password:
+        error = 'Не введён пароль'
+        return render_template('lab4/login.html', error=error, authorized=False, login_value=login)
 
     for user in users:
         if login == user['login'] and password == user['password']:
@@ -156,7 +168,7 @@ def login():
             return redirect('/lab4/login')
     
     error = 'Неверные логин и/или пароль'
-    return render_template('lab4/login.html', error=error, authorized=False)
+    return render_template('lab4/login.html', error=error, authorized=False, login_value=login)
 
 @lab4.route('/lab4/logout', methods=['POST'])
 def logout():
