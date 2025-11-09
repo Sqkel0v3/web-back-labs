@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block lab %}Лабораторная работа 5{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lab5.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <h1>WEB-программирование, часть 2. Лабораторная работа 5</h1>
+        </div>
+        <nav class="main-nav">
+            <div class="nav-section">
+                <span class="nav-title">menu</span>
+                <div class="nav-links">
+                    <a href="/lab5/">Главная</a>
+                </div>
+            </div>
+            <div class="nav-section">
+                <span class="nav-title">База знаний</span>
+                <div class="nav-links">
+                    <a href="/lab5/list">Список статей</a>
+                    <a href="/lab5/create">Создать статью</a>
+                </div>
+            </div>
+            <div class="nav-section">
+                <span class="nav-title">Аккаунт</span>
+                <div class="nav-links">
+                    <a href="/lab5/login">Войти</a>
+                    <a href="/lab5/register">Регистрация</a>
+                    <span class="username">Anonymous</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block main %}{% endblock %}
+    </main>
+
+    <footer>
+        <a href="/">← К списку лабораторных работ</a>
+        &copy; 2025 Лабораторная работа 5
+    </footer>
+</body>
+</html>
