@@ -3,11 +3,146 @@
 {% block lab %}Лабораторная работа 5{% endblock %}
 
 {% block main %}
-    <h1>Статьи</h1>
+    <h1>Мои статьи</h1>
+    
+    {% if not articles %}
+        <div class="no-articles">
+            <h2>У вас пока нет статей</h2>
+            <p>Создайте свою первую статью!</p>
+            <a href="/lab5/create" class="btn btn-primary">Создать статью</a>
+        </div>
+    {% else %}
+        <div class="articles-list">
+            {% for article in articles %}
+                <div class="article-card">
+                    <div class="article-header">
+                        <h2>{{ article['title'] }}</h2>
+                        <div class="article-actions">
+                            <a href="/lab5/edit/{{ article['id'] }}" class="btn btn-edit">Редактировать</a>
+                            <form action="/lab5/delete/{{ article['id'] }}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-delete" onclick="return confirm('Вы уверены, что хотите удалить эту статью?')">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        <p>{{ article['article_text'] }}</p>
+                    </div>
+                    <div class="article-footer">
+                        <span class="article-date">Создано: {{ article.get('created_at', 'Неизвестно') }}</span>
+                        {% if article['is_favorite'] %}
+                            <span class="favorite">Избранное</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="actions">
+        <a href="/lab5/create" class="btn btn-primary">Создать новую статью</a>
+        <a href="/lab5" class="btn btn-secondary">На главную</a>
+    </div>
 
-    {% for article in articles %}
-        <h2>{{ article['title'] }}</h2>
-        <blockquote>{{ article['article_text'] }}</blockquote>
-    {% endfor %}
-
+    <style>
+        .no-articles {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .articles-list {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .article-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .article-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            flex: 1;
+        }
+        
+        .article-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .article-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .article-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+        }
+        
+        .favorite {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
 {% endblock %}
