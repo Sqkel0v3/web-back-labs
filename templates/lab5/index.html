@@ -1,4 +1,4 @@
-{% extends "lab5/base.html" %}
+{% extends "base.html" %}
 
 {% block lab %}Лабораторная работа 5{% endblock %}
 
@@ -14,8 +14,13 @@
 
     <div style="margin-top: 20px; background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
         <h3>Текущий пользователь:</h3>
-        <p><strong>Имя:</strong> anonymous (гость)</p>
-        <p><strong>Статус:</strong> не авторизован</p>
+        <p><strong>Имя:</strong> {{ login if login else 'anonymous (гость)' }}</p>
+        <p><strong>Статус:</strong> {% if login %}авторизован{% else %}не авторизован{% endif %}</p>
+        
+        {% if login %}
+            <form action="/lab5/logout" method="post" style="margin-top: 10px;">
+                <button type="submit">Выйти</button>
+            </form>
+        {% endif %}
     </div>
-
 {% endblock %}
