@@ -1,29 +1,39 @@
-from flask import Blueprint, render_template, request, session, redirect
+from flask import Blueprint, render_template, request, session, redirect, current_app
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
+from os import path
 
 lab5 = Blueprint('lab5', __name__)
 
+@lab5.route('/lab5')
+@lab5.route('/lab5/')
+def lab():
+    return render_template('lab5/index.html', login=session.get('login'))
+
 def db_connect():
-    conn = psycopg2.connect(
-        host='127.0.0.1',
-        database='roman_fomchenko_knowledge_base',
-        user='roman_fomchenko_knowledge_base',
-        password='123'
-    )
-    cur = conn.cursor(cursor_factory=RealDictCursor)
+    if current_app.config['DB_TYPE'] == 'postgres':
+        conn = psycopg2.connect(
+            host='127.0.0.1',
+            database='roman_fomchenko_knowledge_base',
+            user='roman_fomchenko_knowledge_base',
+            password='123'
+        )
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+    else:
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+    
     return conn, cur
 
 def db_close(conn, cur):
     conn.commit()
     cur.close()
     conn.close()
-
-@lab5.route('/lab5')
-@lab5.route('/lab5/')
-def lab():
-    return render_template('lab5/index.html', login=session.get('login'))
 
 @lab5.route('/lab5/register', methods=['GET', 'POST'])
 def register():
@@ -39,19 +49,28 @@ def register():
     try:
         conn, cur = db_connect()
 
-        cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
+        else:
+            cur.execute("SELECT login FROM users WHERE login=?;", (login,))
+
         if cur.fetchone():
             db_close(conn, cur)
             return render_template('lab5/register.html', error="Такой пользователь уже существует")
 
         password_hash = generate_password_hash(password)
-        cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
-        db_close(conn, cur)
 
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
+        else:
+            cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, password_hash))
+
+        db_close(conn, cur)
         return render_template('lab5/success.html', login=login)
     
     except Exception as e:
         return render_template('lab5/register.html', error=f'Ошибка базы данных: {str(e)}')
+
 
 @lab5.route('/lab5/login', methods=['GET', 'POST'])
 def login():

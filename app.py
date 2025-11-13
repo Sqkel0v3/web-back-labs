@@ -1,13 +1,18 @@
 from flask import Flask, request, render_template
 import datetime
+import os
+from dotenv import load_dotenv
 from lab1 import lab1
 from lab2 import lab2
 from lab3 import lab3
 from lab4 import lab4
 from lab5 import lab5
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = 'secret_key_here'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
+app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 
 app.register_blueprint(lab1)
 app.register_blueprint(lab2)
