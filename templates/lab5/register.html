@@ -1,27 +1,104 @@
 {% extends "base.html" %}
 
-{% block lab %}Лабораторная работа 5{% endblock %}
+{% block lab %}Лабораторная работа 5 - Регистрация{% endblock %}
 
 {% block main %}
     <h1>Регистрация</h1>
     
     {% if error %}
-        <div style="color: red; margin-bottom: 15px;">{{ error }}</div>
+        <div class="error" style="color: red; margin-bottom: 15px; padding: 10px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+            {{ error }}
+        </div>
     {% endif %}
     
-    <form action="/lab5/register" method="post">
-        <div>
+    <form method="post">
+        <div class="form-group">
             <label>
-                Логин: <input type="text" name="login">
+                Логин:
+                <input type="text" name="login" required>
             </label>
         </div>
 
-        <div>
+        <div class="form-group">
             <label>
-                Пароль: <input type="password" name="password">
+                Реальное имя (необязательно):
+                <input type="text" name="real_name" maxlength="100">
             </label>
         </div>
-        
-        <button type="submit">Зарегистрироваться</button>
+
+        <div class="form-group">
+            <label>
+                Пароль:
+                <input type="password" name="password" required>
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            <a href="/lab5" class="btn btn-secondary">На главную</a>
+            <a href="/lab5/login" class="btn btn-info">Войти</a>
+        </div>
     </form>
+
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    </style>
 {% endblock %}

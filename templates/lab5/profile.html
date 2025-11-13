@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5 - Профиль{% endblock %}
+
+{% block main %}
+    <h1>Настройки профиля</h1>
+    
+    {% if request.args.get('success') %}
+        <div class="success" style="color: green; margin-bottom: 15px; padding: 10px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px;">
+            ✅ Профиль успешно обновлен!
+        </div>
+    {% endif %}
+    
+    {% if errors %}
+        <div class="errors" style="color: red; margin-bottom: 15px;">
+            {% for error in errors %}
+                <div style="padding: 10px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 5px;">
+                    ❌ {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form method="post">
+        <div class="form-section">
+            <h3>Основная информация</h3>
+            
+            <div class="form-group">
+                <label for="login">Логин:</label>
+                <input type="text" id="login" value="{{ user['login'] }}" disabled>
+                <small>Логин нельзя изменить</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="real_name">Реальное имя:</label>
+                <input type="text" id="real_name" name="real_name" value="{{ user.get('real_name', '') }}" maxlength="100">
+                <small>Как к вам обращаться</small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Смена пароля</h3>
+            
+            <div class="form-group">
+                <label for="current_password">Текущий пароль:</label>
+                <input type="password" id="current_password" name="current_password">
+                <small>Требуется только для смены пароля</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="new_password">Новый пароль:</label>
+                <input type="password" id="new_password" name="new_password">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Подтверждение пароля:</label>
+                <input type="password" id="confirm_password" name="confirm_password">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a href="/lab5" class="btn btn-secondary">На главную</a>
+            <a href="/lab5/list" class="btn btn-info">Мои статьи</a>
+        </div>
+    </form>
+
+    <style>
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .form-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        
+        input:disabled {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    </style>
+{% endblock %}

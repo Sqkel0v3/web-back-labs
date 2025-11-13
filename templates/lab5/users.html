@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5 - Пользователи{% endblock %}
+
+{% block main %}
+    <h1>Зарегистрированные пользователи</h1>
+    
+    <div class="users-list">
+        {% for user in users %}
+            <div class="user-card">
+                <div class="user-avatar">
+                    {{ user['login'][0] | upper }}
+                </div>
+                <div class="user-info">
+                    <h3>{{ user['login'] }}</h3>
+                    <p class="real-name">
+                        {% if user['real_name'] %}
+                            {{ user['real_name'] }}
+                        {% else %}
+                            <span class="no-name">Имя не указано</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="actions">
+        <a href="/lab5" class="btn btn-primary">На главную</a>
+        {% if session.get('login') %}
+            <a href="/lab5/profile" class="btn btn-secondary">Мой профиль</a>
+        {% endif %}
+    </div>
+
+    <style>
+        .users-list {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .user-card {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .user-info h3 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+        
+        .real-name {
+            margin: 0;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .no-name {
+            color: #999;
+            font-style: normal;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
+{% endblock %}
