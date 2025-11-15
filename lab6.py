@@ -37,21 +37,64 @@ def api():
         office_number = data['params']
         for office in offices:
             if office['number'] == office_number:
+                if office['tenant'] != "":
+                    return {
+                        'jsonrpc': '2.0',
+                        'error': {
+                            'code': 2,
+                            'message': 'Already booked'
+                        },
+                        'id': id
+                    }
+                
                 office['tenant'] = login
                 return {
                     'jsonrpc': '2.0',
                     'result': 'success',
                     'id': id
                 }
-        
-        return {
-            'jsonrpc': '2.0',
-            'error': {
-                'code': -32601,
-                'message': 'Method not found'
-            },
-            'id': id
-        }
+    
+    elif data['method'] == 'cancellation':
+        login = session.get('login')
+        if not login:
+            return {
+                'jsonrpc': '2.0',
+                'error': {
+                    'code': 1,
+                    'message': 'Unauthorized'
+                },
+                'id': id
+            }
+
+        office_number = data['params']
+        for office in offices:
+            if office['number'] == office_number:
+                if not office['tenant']:
+                    return {
+                        'jsonrpc': '2.0',
+                        'error': {
+                            'code': 3,
+                            'message': 'Office is not booked'
+                        },
+                        'id': id
+                    }
+
+                if office['tenant'] != login:
+                    return {
+                        'jsonrpc': '2.0',
+                        'error': {
+                            'code': 4,
+                            'message': 'You can only cancel your own booking'
+                        },
+                        'id': id
+                    }
+
+                office['tenant'] = ""
+                return {
+                    'jsonrpc': '2.0',
+                    'result': 'success',
+                    'id': id
+                }
     
     return {
         'jsonrpc': '2.0',
