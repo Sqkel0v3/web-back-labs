@@ -25,32 +25,49 @@ function getOfficeList() {
         const ul = document.getElementById('office-list');
         ul.innerHTML = ''; // Очищаем список
         
+        let totalCost = 0;
+        const currentUser = '{{ session.get("login", "") }}';
+        
         for(let i = 0; i < office_list.length; i++) {
             const office = office_list[i];
             const li = document.createElement('li');
-
-            const currentUser = '{{ session.get("login", "") }}';
+            li.className = 'office-item';
             
-            li.innerText = `${office.number}: ${office.tenant || 'свободен'}`;
+            if (office.tenant) {
+                if (office.tenant === currentUser) {
+                    li.classList.add('office-my-booking');
+                }
+            }
 
+            li.innerHTML = `<strong>Кабинет ${office.number}</strong>: ${office.tenant || 'свободен'} - ${office.price} руб./мес.`;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'office-actions';
+            
             if (!office.tenant) {
                 const bookingButton = document.createElement('button');
+                bookingButton.className = 'btn btn-book';
                 bookingButton.innerText = 'зарезервировать';
                 bookingButton.onclick = function() { 
                     booking(office.number); 
                 };
-                li.appendChild(bookingButton);
+                actionsDiv.appendChild(bookingButton);
             } else if (office.tenant === currentUser) {
                 const cancelButton = document.createElement('button');
+                cancelButton.className = 'btn btn-cancel';
                 cancelButton.innerText = 'освободить';
                 cancelButton.onclick = function() { 
                     cancellation(office.number); 
                 };
-                li.appendChild(cancelButton);
+                actionsDiv.appendChild(cancelButton);
+                totalCost += office.price;
             }
 
+            li.appendChild(actionsDiv);
             ul.appendChild(li);
         }
+
+        document.getElementById('total-cost').textContent = totalCost;
     });
 }
 
@@ -135,14 +152,125 @@ document.addEventListener('DOMContentLoaded', function() {
     getOfficeList();
 });
 </script>
+
+<style>
+    .office-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .office-item {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .office-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+    }
+
+    .office-my-booking {
+        background: #e8f5e8;
+        border-color: #28a745;
+    }
+
+    .office-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        font-size: 14px;
+    }
+
+    .btn-book {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-book:hover {
+        background: #218838;
+    }
+
+    .btn-cancel {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #c82333;
+    }
+
+    .total-cost {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e8f5e8;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+
+    .total-cost h3 {
+        margin: 0 0 10px 0;
+        color: #155724;
+    }
+
+    .total-cost p {
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .auth-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #856404;
+    }
+
+    .user-info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #0c5460;
+    }
+</style>
 {% endblock %}
 
 {% block main %}
     <h1>Список кабинетов</h1>
+    
     {% if session.get('login') %}
-        <p>Вы вошли как: <strong>{{ session.get('login') }}</strong></p>
+        <div class="user-info">
+            Вы вошли как: <strong>{{ session.get('login') }}</strong>
+        </div>
     {% else %}
-        <p style="color: red;">Вы не авторизованы. Для бронирования офисов необходимо авторизоваться.</p>
+        <div class="auth-warning">
+            Вы не авторизованы. Для бронирования офисов необходимо авторизоваться.
+        </div>
     {% endif %}
+    
     <ul id="office-list"></ul>
+    
+    <div class="total-cost">
+        <h3>Общая стоимость аренды</h3>
+        <p>Сумма за все арендованные вами офисы: <strong id="total-cost">0</strong> руб./мес.</p>
+    </div>
 {% endblock %}
