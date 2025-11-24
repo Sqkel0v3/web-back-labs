@@ -105,7 +105,7 @@ def login():
         
         session['login'] = login
         session['user_id'] = user['id']
-        session['real_name'] = user.get('real_name', '')
+        session['real_name'] = user['real_name'] if 'real_name' in user.keys() else ''
         db_close(conn, cur)
         return render_template('lab5/success_login.html', login=login)
     

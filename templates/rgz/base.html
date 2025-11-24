@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Онлайн-магазин мебели{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <a href="{{ url_for('rgz.index') }}">Каталог</a>
+
+    {% if user %}
+        <a href="{{ url_for('rgz.cart') }}">Корзина</a>
+        <a href="{{ url_for('rgz.logout') }}">Выйти ({{ user.username }})</a>
+    {% else %}
+        <a href="{{ url_for('rgz.login') }}">Вход</a>
+        <a href="{{ url_for('rgz.register') }}">Регистрация</a>
+    {% endif %}
+</div>
+
+<div class="container">
+    {% with msgs = get_flashed_messages() %}
+  {% if msgs %}
+    <div class="flash-item">{{ msgs[-1] }}</div>
+  {% endif %}
+{% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
+
+

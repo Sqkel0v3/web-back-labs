@@ -1,0 +1,30 @@
+{% extends "rgz/base.html" %}
+{% block title %}Каталог мебели{% endblock %}
+{% block content %}
+
+<h2>Каталог мебели</h2>
+
+<div class="products-grid">
+  {% for p in products %}
+    <div class="product-card">
+        <img src="{{ p.image_url }}" alt="{{ p.name }}">
+        <h3>{{ p.name }}</h3>
+        <p>{{ p.description }}</p>
+        <p><b>{{ p.price }} ₽</b></p>
+
+        {% if user %}
+          <form method="post" action="{{ url_for('rgz.add', pid=p.id) }}">
+              <input type="number" name="quantity" min="1" value="1" style="width:80px;">
+              <button class="button">Добавить в корзину</button>
+          </form>
+        {% else %}
+          <p style="color:gray;">Авторизуйтесь для покупки</p>
+        {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+
+

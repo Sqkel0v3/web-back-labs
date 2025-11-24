@@ -8,6 +8,7 @@ from lab3 import lab3
 from lab4 import lab4
 from lab5 import lab5
 from lab6 import lab6
+from rgz import rgz
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ app.register_blueprint(lab3)
 app.register_blueprint(lab4)
 app.register_blueprint(lab5)
 app.register_blueprint(lab6)
+app.register_blueprint(rgz)
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -527,6 +529,7 @@ def index():
                 <li><a href="/lab4">Четвертая лабораторная</a></li>
                 <li><a href="/lab5">Пятая лабораторная</a></li>
                 <li><a href="/lab6">Шестая лабораторная</a></li>
+                <li><a href="/rgz">РГЗ</a></li>
             </ul>
         </nav>
         

@@ -1,0 +1,45 @@
+{% extends "rgz/base.html" %}
+{% block title %}Корзина{% endblock %}
+{% block content %}
+
+<h2>Корзина</h2>
+
+{% if items %}
+<table class="table">
+    <tr>
+        <th>Название</th>
+        <th>Цена</th>
+        <th>Кол-во</th>
+        <th>Сумма</th>
+        <th></th>
+    </tr>
+
+    {% for i in items %}
+    <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.price }} ₽</td>
+        <td>{{ i.quantity }}</td>
+        <td>{{ i.subtotal }} ₽</td>
+        <td>
+            <form action="{{ url_for('rgz.remove', cid=i.cart_id) }}" method="post">
+                <button class="button" style="background:#c0392b;">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="total-box">
+    Итого: {{ total }} ₽
+</div>
+
+<a href="{{ url_for('rgz.checkout') }}">
+    <button class="button" style="margin-top:20px;">Оформить заказ</button>
+</a>
+{% else %}
+<p>Корзина пуста.</p>
+{% endif %}
+
+{% endblock %}
+
+
