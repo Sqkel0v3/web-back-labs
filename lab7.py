@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, jsonify
-import json
 
 lab7 = Blueprint('lab7', __name__)
 
@@ -70,6 +69,9 @@ def put_film(id):
         return jsonify({"error": "Фильм не найден"}), 404
 
     film = request.get_json()
+    
+    if film['description'] == '':
+        return jsonify({"description": "Заполните описание"}), 400
 
     films[id] = film
 
@@ -78,6 +80,9 @@ def put_film(id):
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()
+    
+    if film['description'] == '':
+        return jsonify({"description": "Заполните описание"}), 400
 
     films.append(film)
 
