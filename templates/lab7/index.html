@@ -5,164 +5,230 @@
 {% block script %}
 <script src="{{ url_for('static', filename='lab7/main.js') }}"></script>
 <style>
-/* Стили для модального окна */
 .modal {
     display: none;
-    z-index: 100;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     background: white;
     width: 500px;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     position: fixed;
-    padding: 25px;
-    border-radius: 8px;
+    padding: 30px;
+    border-radius: 12px;
     border: 1px solid #ddd;
 }
 
-/* Стили для таблицы */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 25px 0;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
 }
 
-table th {
-    background-color: #4CAF50;
-    color: white;
-    padding: 12px 15px;
+table thead tr {
+    background-color: #009879;
+    color: #ffffff;
     text-align: left;
-    border-bottom: 2px solid #ddd;
 }
 
+table th,
 table td {
-    padding: 10px 15px;
-    border-bottom: 1px solid #ddd;
+    padding: 12px 15px;
 }
 
-table tr:hover {
+table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+table tbody tr:hover {
     background-color: #f5f5f5;
+    font-weight: bold;
+    color: #009879;
 }
 
-/* Стили для кнопок */
 button {
-    background-color: #4CAF50;
+    background-color: #009879;
     color: white;
     border: none;
-    padding: 8px 15px;
-    margin: 3px;
-    border-radius: 4px;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 14px;
+    transition: all 0.3s;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #007d63;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 button:active {
-    background-color: #3d8b40;
+    transform: translateY(0);
 }
 
-/* Кнопка отмена */
 button[onclick="cancel()"] {
-    background-color: #f44336;
+    background-color: #dc3545;
 }
 
 button[onclick="cancel()"]:hover {
-    background-color: #da190b;
+    background-color: #c82333;
 }
 
-/* Стили для полей ввода */
-input, textarea {
-    width: 95%;
-    padding: 8px;
-    margin: 5px 0 15px 0;
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 20px 0;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
 textarea {
-    height: 100px;
+    height: 120px;
     resize: vertical;
+    font-family: inherit;
 }
 
-/* Стили для ошибок */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #009879;
+    box-shadow: 0 0 5px rgba(0, 152, 121, 0.3);
+}
+
 .error-message {
-    color: #f44336;
+    color: #dc3545;
     font-size: 12px;
-    margin-top: -10px;
-    margin-bottom: 10px;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    display: block;
+    font-weight: bold;
 }
 
-/* Стили для оригинального названия */
 .original-title {
     font-style: italic;
     color: #666;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    margin-left: 10px;
 }
 
-/* Заголовок */
 h1 {
     color: #333;
-    border-bottom: 2px solid #4CAF50;
-    padding-bottom: 10px;
+    border-bottom: 3px solid #009879;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    text-align: center;
 }
 
-/* Контейнер для основной кнопки */
+label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-top: 15px;
+}
+
+label i {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: normal;
+}
+
 .main-button {
-    margin: 20px 0;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+@media (max-width: 768px) {
+    .modal {
+        width: 90%;
+        padding: 20px;
+    }
+    
+    table {
+        font-size: 0.8em;
+    }
+    
+    table th, table td {
+        padding: 8px 10px;
+    }
 }
 </style>
 {% endblock %}
 
 {% block main %}
-<h1>Список фильмов</h1>
+<h1>Управление фильмами</h1>
 
 <table>
     <thead>
         <tr>
-            <th colspan="2">Название</th>
+            <th>Русское название</th>
+            <th>Оригинальное название</th>
             <th>Год</th>
-            <th>Действие</th>
+            <th>Действия</th>
         </tr>
     </thead>
-    <tbody id="film-list"></tbody>
+    <tbody id="film-list">
+
+    </tbody>
 </table>
 
 <div class="main-button">
-    <button onclick="addFilm()">Добавить фильм</button>
+    <button onclick="addFilm()">Добавить новый фильм</button>
 </div>
 
 <div class="modal">
     <input type="hidden" id="id">
+    
     <label>
-        Название фильма на русском:
-        <input type="text" id="title_ru">
-    </label><br>
+        Русское название (обязательно):
+        <input type="text" id="title_ru" placeholder="Введите название на русском">
+        <span id="title_ru_error" class="error-message"></span>
+    </label>
 
     <label>
-        Название фильма на оригинальном языке
-        <i>(если фильм русский, то оставьте пустым):</i>
-        <input type="text" id="title">
-    </label><br>
+        Оригинальное название:
+        <i>(оставьте пустым, чтобы автоматически заполнилось русским названием)</i>
+        <input type="text" id="title" placeholder="Введите оригинальное название">
+        <span id="title_error" class="error-message"></span>
+    </label>
 
     <label>
-        Год выпуска:
-        <input type="number" id="year" min="1888" max="2024">
-    </label><br>
+        Год выпуска (обязательно, 1895-{{ текущий_год }}):
+        <input type="number" id="year" min="1895" max="{{ текущий_год }}" placeholder="Например: 2024">
+        <span id="year_error" class="error-message"></span>
+    </label>
 
     <label>
-        Описание:
-        <textarea id="description"></textarea>
-        <div id="description_error" class="error-message"></div>
-    </label><br>
+        Описание (обязательно, до 2000 символов):
+        <textarea id="description" placeholder="Введите описание фильма"></textarea>
+        <span id="description_error" class="error-message"></span>
+    </label>
 
-    <button onclick="sendFilm()">ОК</button>
-    <button onclick="cancel()">Отмена</button>
+    <div class="modal-buttons">
+        <button onclick="sendFilm()">Сохранить</button>
+        <button onclick="cancel()">Отмена</button>
+    </div>
 </div>
 
 <script>

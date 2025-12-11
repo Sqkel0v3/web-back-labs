@@ -9,47 +9,52 @@ function fillFilmList() {
         
         for(let i = 0; i < films.length; i++) {
             let tr = document.createElement('tr');
-            
-            let tdTitleRus = document.createElement('td'); // Русское название первое
-            let tdTitle = document.createElement('td');    // Оригинальное второе
-            let tdYear = document.createElement('td');
-            let tdActions = document.createElement('td');
 
+            let tdTitleRus = document.createElement('td');
             tdTitleRus.innerText = films[i].title_ru;
 
+            let tdTitle = document.createElement('td');
             if (films[i].title && films[i].title !== films[i].title_ru) {
                 let originalSpan = document.createElement('span');
                 originalSpan.className = 'original-title';
-                originalSpan.innerText = ` (${films[i].title})`;
-                tdTitleRus.appendChild(originalSpan);
+                originalSpan.innerText = films[i].title;
+                tdTitle.appendChild(originalSpan);
+            } else {
+                tdTitle.innerHTML = '<em>— то же что русское —</em>';
             }
 
-            tdTitle.innerHTML = '';
-            
+            let tdYear = document.createElement('td');
             tdYear.innerText = films[i].year;
-            
+
+            let tdActions = document.createElement('td');
+
             let editButton = document.createElement('button');
-            editButton.innerText = 'редактировать';
+            editButton.innerText = 'Редактировать';
             editButton.onclick = function() {
-                editFilm(i);
+                editFilm(films[i].id);
             };
-            
+
             let delButton = document.createElement('button');
-            delButton.innerText = 'удалить';
+            delButton.innerText = 'Удалить';
             delButton.onclick = function() {
-                deleteFilm(i, films[i].title_ru);
+                deleteFilm(films[i].id, films[i].title_ru);
             };
             
             tdActions.append(editButton);
             tdActions.append(delButton);
-            
+
             tr.append(tdTitleRus);
             tr.append(tdTitle);
             tr.append(tdYear);
             tr.append(tdActions);
-            
+
             tbody.append(tr);
         }
+    })
+    .catch(function(error) {
+        console.error('Ошибка при загрузке фильмов:', error);
+        document.getElementById('film-list').innerHTML = 
+            '<tr><td colspan="4" style="text-align: center; color: red;">Ошибка загрузки данных</td></tr>';
     });
 }
 
@@ -59,18 +64,35 @@ function deleteFilm(id, title) {
     }
     
     fetch(`/lab7/rest-api/films/${id}`, {method: 'DELETE'})
-    .then(function () {
-        fillFilmList();
+    .then(function (response) {
+        if (response.status === 204) {
+            alert('Фильм успешно удален!');
+            fillFilmList();
+        } else {
+            alert('Ошибка при удалении фильма');
+        }
+    })
+    .catch(function(error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при удалении фильма');
     });
 }
 
 function showModal() {
     document.querySelector('div.modal').style.display = 'block';
-    document.getElementById('description_error').innerText = '';
+
+    clearAllErrors();
 }
 
 function hideModal() {
     document.querySelector('div.modal').style.display = 'none';
+}
+
+function clearAllErrors() {
+    document.getElementById('title_ru_error').innerText = '';
+    document.getElementById('title_error').innerText = '';
+    document.getElementById('year_error').innerText = '';
+    document.getElementById('description_error').innerText = '';
 }
 
 function cancel() {
@@ -83,7 +105,7 @@ function addFilm() {
     document.getElementById('title_ru').value = "";
     document.getElementById('year').value = "";
     document.getElementById('description').value = "";
-    document.getElementById('description_error').innerText = '';
+    clearAllErrors();
     showModal();
 }
 
@@ -93,17 +115,22 @@ function editFilm(id) {
         return data.json();
     })
     .then(function (film) {
-        document.getElementById('id').value = id;
-        document.getElementById('title').value = film.title;
+        document.getElementById('id').value = film.id;
+        document.getElementById('title').value = film.title || '';
         document.getElementById('title_ru').value = film.title_ru;
         document.getElementById('year').value = film.year;
         document.getElementById('description').value = film.description;
-        document.getElementById('description_error').innerText = '';
+        clearAllErrors();
         showModal();
+    })
+    .catch(function(error) {
+        console.error('Ошибка при загрузке фильма:', error);
+        alert('Не удалось загрузить данные фильма');
     });
 }
 
 function sendFilm() {
+
     const film = {
         title: document.getElementById('title').value,
         title_ru: document.getElementById('title_ru').value,
@@ -127,15 +154,42 @@ function sendFilm() {
     })
     .then(function(resp) {
         if(resp.ok) {
+
             fillFilmList();
             hideModal();
+            alert(id ? 'Фильм успешно обновлен!' : 'Фильм успешно добавлен!');
             return {};
         }
+
         return resp.json();
     })
     .then(function(errors) {
-        if(errors.description) {
-            document.getElementById('description_error').innerText = errors.description;
+        if (errors && Object.keys(errors).length > 0) {
+
+            clearAllErrors();
+
+            if(errors.title_ru) {
+                document.getElementById('title_ru_error').innerText = errors.title_ru;
+            }
+            if(errors.title) {
+                document.getElementById('title_error').innerText = errors.title;
+            }
+            if(errors.year) {
+                document.getElementById('year_error').innerText = errors.year;
+            }
+            if(errors.description) {
+                document.getElementById('description_error').innerText = errors.description;
+            }
+            if(errors.error) {
+
+                alert('Ошибка сервера: ' + errors.error);
+            }
         }
+    })
+    .catch(function(error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении фильма');
     });
 }
+
+setInterval(fillFilmList, 30000);
