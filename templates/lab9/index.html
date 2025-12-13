@@ -7,6 +7,77 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lab9.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .auth-form input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            border: none;
+            width: 200px;
+        }
+        
+        .auth-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .santa-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .auth-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .requires-auth {
+            border: 2px solid #ff6b6b;
+        }
+        
+        .limit-info {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+    </style>
 </head>
 <body>
     <div class="snowflakes" aria-hidden="true">
@@ -26,6 +97,12 @@
         <div class="header-content">
             <h1><i class="fas fa-tree"></i> Новогодние Подарки <i class="fas fa-tree"></i></h1>
             <p class="subtitle">Лабораторная работа 9</p>
+            {% if is_authenticated %}
+            <div class="user-info">
+                <i class="fas fa-user"></i> {{ username }}
+                <button onclick="logout()" style="margin-left:10px; padding:5px 10px; background:#ff6b6b; color:white; border:none; border-radius:5px; font-size:12px;">Выйти</button>
+            </div>
+            {% endif %}
         </div>
         <div class="garland"></div>
     </header>
@@ -33,40 +110,78 @@
     <main class="container">
         <nav class="lab-nav">
             <a href="/" class="nav-btn"><i class="fas fa-home"></i> Главная</a>
+            {% if is_authenticated %}
+            <button onclick="callSanta()" class="nav-btn santa-btn"><i class="fas fa-sleigh"></i> Дед Мороз</button>
+            {% endif %}
             <button onclick="resetGame()" class="nav-btn reset-btn"><i class="fas fa-redo"></i> Сбросить игру</button>
         </nav>
+
+        {% if not is_authenticated %}
+        <div class="auth-panel">
+            <h3><i class="fas fa-key"></i> Авторизация</h3>
+            <p>Войдите, чтобы открывать больше коробок и вызвать Деда Мороза!</p>
+            <div class="auth-form">
+                <input type="text" id="username" placeholder="Логин" value="user">
+                <input type="password" id="password" placeholder="Пароль" value="123">
+                <button onclick="login()" class="auth-btn">Войти</button>
+                <div style="margin-top:10px; font-size:0.9em;">
+                    <p>Тестовые аккаунты (логин/пароль):</p>
+                    <p><strong>user / 123</strong> | <strong>admin / admin</strong> | <strong>student / password</strong></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="info-panel">
             <div class="stats">
                 <div class="stat-item">
                     <span class="stat-icon"><i class="fas fa-gift"></i></span>
                     <span class="stat-label">Открыто коробок:</span>
-                    <span id="openedCount" class="stat-value">0</span>/3
+                    <span id="openedCount" class="stat-value">{{ opened_count }}</span>/<span id="userLimit">{{ user_limit }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon"><i class="fas fa-boxes"></i></span>
                     <span class="stat-label">Осталось коробок:</span>
-                    <span id="remainingCount" class="stat-value">10</span>
+                    <span id="remainingCount" class="stat-value">{{ total_boxes }}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-icon"><i class="fas fa-star"></i></span>
-                    <span class="stat-label">Ваш прогресс:</span>
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
+                    <span class="stat-icon">
+                        {% if is_authenticated %}
+                        <i class="fas fa-user-check" style="color:#2ecc71;"></i>
+                        {% else %}
+                        <i class="fas fa-user" style="color:#e74c3c;"></i>
+                        {% endif %}
+                    </span>
+                    <span class="stat-label">Статус:</span>
+                    <span id="authStatus" style="color: {% if is_authenticated %}#2ecc71{% else %}#e74c3c{% endif %};">
+                        {% if is_authenticated %}Авторизован{% else %}Гость{% endif %}
+                    </span>
                 </div>
             </div>
             
             <div class="instructions">
                 <h3><i class="fas fa-info-circle"></i> Инструкция:</h3>
-                <p>Нажмите на любую коробку, чтобы открыть подарок. Вы можете открыть не более 3 коробок. В каждой коробке уникальное поздравление!</p>
+                <div class="limit-info">
+                    {% if is_authenticated %}
+                    <p><strong>✅ Вы авторизованы!</strong> Можете открыть <strong>до 5 коробок</strong> (включая коробки 6-10).</p>
+                    {% else %}
+                    <p><strong>👋 Вы гость.</strong> Можете открыть <strong>только 3 коробки</strong> (только коробки 1-5).</p>
+                    {% endif %}
+                </div>
+                <p><strong>Коробки 1-5:</strong> 🎁 доступны всем пользователям</p>
+                <p><strong>Коробки 6-10:</strong> 🔒 только для авторизованных</p>
+                {% if is_authenticated %}
+                <p style="color:#2ecc71;"><i class="fas fa-sleigh"></i> Теперь вы можете вызвать Деда Мороза!</p>
+                {% else %}
+                <p style="color:#e74c3c;"><i class="fas fa-lock"></i> Войдите в систему, чтобы открывать больше коробок!</p>
+                {% endif %}
             </div>
         </div>
 
         <div class="game-area">
             <div class="gift-boxes-container">
                 {% for position in box_positions %}
-                <div class="gift-box" 
+                <div class="gift-box {% if position.id > 5 %}requires-auth{% endif %}" 
                      id="box-{{ position.id }}" 
                      data-id="{{ position.id }}"
                      style="top: {{ position.top }}; left: {{ position.left }};"
@@ -76,6 +191,9 @@
                         <div class="ribbon ribbon-vertical"></div>
                         <div class="ribbon ribbon-horizontal"></div>
                         <span class="box-number">{{ position.id }}</span>
+                        {% if position.id > 5 %}
+                        <div class="auth-badge" title="Требуется авторизация"><i class="fas fa-lock"></i></div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -98,6 +216,9 @@
                 <div class="modal-body">
                     <div id="giftImage" class="gift-image"></div>
                     <p id="congratMessage"></p>
+                    <div id="limitInfo" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; display: none;">
+                        <p id="remainingLimitText" style="margin: 0; font-weight: bold;"></p>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button onclick="closeModal()" class="modal-btn">Закрыть</button>
@@ -106,12 +227,15 @@
         </div>
 
         <div class="footer-info">
-            <p><i class="fas fa-snowflake"></i> С Новым Годом! Пусть все ваши желания сбудутся! <i class="fas fa-snowflake"></i></p>
+            <p><i class="fas fa-snowflake"></i> С Новым Годом! <i class="fas fa-snowflake"></i></p>
+            <p>Лабораторная работа 9 - Система авторизации и лимиты</p>
         </div>
     </main>
 
-    <script src="{{ url_for('static', filename='js/lab9.js') }}"></script>
     <script>
+        let isAuthenticated = {{ 'true' if is_authenticated else 'false' }};
+        let userLimit = {{ user_limit }};
+
         function openBox(boxId) {
             fetch('/lab9/api/open_box', {
                 method: 'POST',
@@ -125,9 +249,24 @@
                 if (data.success) {
                     document.getElementById('openedCount').textContent = data.opened_count;
                     document.getElementById('remainingCount').textContent = data.remaining_boxes;
+                    document.getElementById('userLimit').textContent = data.is_authenticated ? 5 : 3;
                     
                     document.getElementById('congratMessage').textContent = data.message;
                     document.getElementById('giftImage').innerHTML = `<span style="font-size: 4rem;">${data.gift}</span>`;
+                    
+                    const limitInfo = document.getElementById('limitInfo');
+                    const remainingText = document.getElementById('remainingLimitText');
+                    
+                    if (data.remaining_limit >= 0) {
+                        limitInfo.style.display = 'block';
+                        if (data.is_authenticated) {
+                            remainingText.innerHTML = `<i class="fas fa-user-check"></i> Вы авторизованы! Осталось коробок: <strong>${data.remaining_limit}</strong> из 5`;
+                            remainingText.style.color = '#2ecc71';
+                        } else {
+                            remainingText.innerHTML = `<i class="fas fa-user"></i> Вы гость. Осталось коробок: <strong>${data.remaining_limit}</strong> из 3`;
+                            remainingText.style.color = '#e74c3c';
+                        }
+                    }
                     
                     document.getElementById('messageModal').style.display = 'flex';
                     
@@ -135,9 +274,21 @@
                     box.classList.add('opened');
                     box.onclick = null;
                     
-                    addGiftToCollection(boxId, data.message, data.gift);
+                    if (data.is_authenticated !== isAuthenticated) {
+                        isAuthenticated = data.is_authenticated;
+                        location.reload();
+                    }
+                    
+                    addGiftToCollection(boxId, data.message, data.gift, data.requires_auth);
                 } else {
-                    alert(data.message);
+                    if (data.requires_auth) {
+                        document.getElementById('congratMessage').textContent = data.message;
+                        document.getElementById('giftImage').innerHTML = `<span style="font-size: 4rem;">🔒</span>`;
+                        document.getElementById('limitInfo').style.display = 'none';
+                        document.getElementById('messageModal').style.display = 'flex';
+                    } else {
+                        alert(data.message);
+                    }
                 }
             })
             .catch(error => {
@@ -146,11 +297,81 @@
             });
         }
         
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('Введите логин и пароль');
+                return;
+            }
+            
+            fetch('/lab9/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка сервера при авторизации');
+            });
+        }
+        
+        function logout() {
+            fetch('/lab9/logout', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Вы вышли из системы');
+                    location.reload();
+                }
+            });
+        }
+        
+        function callSanta() {
+            if (!isAuthenticated) {
+                alert('Только авторизованные пользователи могут вызывать Деда Мороза!');
+                return;
+            }
+            
+            if (confirm('Дед Мороз наполнит все коробки новыми подарками! Ваши текущие подарки будут сброшены. Продолжить?')) {
+                fetch('/lab9/api/santa', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при вызове Деда Мороза');
+                });
+            }
+        }
+        
         function closeModal() {
             document.getElementById('messageModal').style.display = 'none';
         }
         
-        function addGiftToCollection(boxId, message, gift) {
+        function addGiftToCollection(boxId, message, gift, requiresAuth) {
             const container = document.getElementById('giftsContainer');
             const emptyMessage = container.querySelector('.empty-message');
             
@@ -166,20 +387,22 @@
                     <span style="font-size: 3rem;">${gift}</span>
                 </div>
                 <p><strong>Поздравление:</strong> ${message}</p>
-                <p class="small"><i class="fas fa-calendar"></i> Открыто сегодня</p>
+                ${requiresAuth ? '<p style="color:#e67e22; font-weight:bold;"><i class="fas fa-crown"></i> Премиум-подарок (требовалась авторизация)</p>' : ''}
+                <p style="font-size:0.9em; color:#666;"><i class="fas fa-calendar"></i> Открыто сегодня</p>
             `;
             
             container.appendChild(giftCard);
         }
         
         function resetGame() {
-            if (confirm('Вы уверены, что хотите сбросить игру? Все ваши открытые подарки будут потеряны.')) {
+            if (confirm('Вы уверены, что хотите сбросить игру? Все ваши открытые подарки будут потеряны, и вы выйдете из системы.')) {
                 fetch('/lab9/reset', {
                     method: 'POST'
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        alert(data.message);
                         location.reload();
                     }
                 });
@@ -199,6 +422,15 @@
                 .then(data => {
                     document.getElementById('openedCount').textContent = data.opened_count;
                     document.getElementById('remainingCount').textContent = data.remaining_boxes;
+                    document.getElementById('userLimit').textContent = data.user_limit;
+                    
+                    isAuthenticated = data.is_authenticated;
+                    userLimit = data.user_limit;
+                    
+                    if (data.is_authenticated) {
+                        document.getElementById('authStatus').textContent = 'Авторизован';
+                        document.getElementById('authStatus').style.color = '#2ecc71';
+                    }
                     
                     data.opened_boxes.forEach(boxId => {
                         const box = document.getElementById(`box-${boxId}`);
