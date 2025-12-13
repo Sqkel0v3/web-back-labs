@@ -1,20 +1,10 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template_string
 import datetime
 from os import path
 import os
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy  # УДАЛИТЬ
 from db import db
 from dotenv import load_dotenv
-from lab1 import lab1
-from lab2 import lab2
-from lab3 import lab3
-from lab4 import lab4
-from lab5 import lab5
-from lab6 import lab6
-from lab7 import lab7
-from lab8 import lab8
-from lab9 import lab9
-from rgz import rgz
 
 load_dotenv()
 
@@ -39,7 +29,20 @@ else:
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Инициализируем базу данных с приложением
 db.init_app(app)
+
+# Импортируем и регистрируем Blueprints ПОСЛЕ инициализации db
+from lab1 import lab1
+from lab2 import lab2
+from lab3 import lab3
+from lab4 import lab4
+from lab5 import lab5
+from lab6 import lab6
+from lab7 import lab7
+from lab8 import lab8
+from lab9 import lab9
+from rgz import rgz
 
 app.register_blueprint(lab1)
 app.register_blueprint(lab2)
@@ -51,6 +54,8 @@ app.register_blueprint(lab7)
 app.register_blueprint(lab8)
 app.register_blueprint(lab9)
 app.register_blueprint(rgz)
+
+# ... остальной код (обработчики ошибок, маршруты) ...
 
 if __name__ == '__main__':
     app.run(debug=True)
