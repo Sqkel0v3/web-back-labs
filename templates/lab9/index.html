@@ -3,38 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лабораторная работа 9</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Новогодние Подарки - Лабораторная работа 9</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lab9.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>Лабораторная работа 9</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Главная</a></li>
-                
-            </ul>
-        </nav>
+    <div class="snowflakes" aria-hidden="true">
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+        <div class="snowflake">*</div>
+    </div>
+
+    <header class="new-year-header">
+        <div class="header-content">
+            <h1><i class="fas fa-tree"></i> Новогодние Подарки <i class="fas fa-tree"></i></h1>
+            <p class="subtitle">Лабораторная работа 9</p>
+        </div>
+        <div class="garland"></div>
     </header>
 
-    <main>
-        <section class="lab-description">
-            <h2></h2>
-            <p></p>
-        </section>
+    <main class="container">
+        <nav class="lab-nav">
+            <a href="/" class="nav-btn"><i class="fas fa-home"></i> Главная</a>
+            <button onclick="resetGame()" class="nav-btn reset-btn"><i class="fas fa-redo"></i> Сбросить игру</button>
+        </nav>
 
-        <section class="lab-interface">
-            <h2></h2>
-            <div class="lab-content">
-                <p></p>
+        <div class="info-panel">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-icon"><i class="fas fa-gift"></i></span>
+                    <span class="stat-label">Открыто коробок:</span>
+                    <span id="openedCount" class="stat-value">0</span>/3
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon"><i class="fas fa-boxes"></i></span>
+                    <span class="stat-label">Осталось коробок:</span>
+                    <span id="remainingCount" class="stat-value">10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon"><i class="fas fa-star"></i></span>
+                    <span class="stat-label">Ваш прогресс:</span>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
             </div>
-        </section>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> Инструкция:</h3>
+                <p>Нажмите на любую коробку, чтобы открыть подарок. Вы можете открыть не более 3 коробок. В каждой коробке уникальное поздравление!</p>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="gift-boxes-container">
+                {% for position in box_positions %}
+                <div class="gift-box" 
+                     id="box-{{ position.id }}" 
+                     data-id="{{ position.id }}"
+                     style="top: {{ position.top }}; left: {{ position.left }};"
+                     onclick="openBox({{ position.id }})">
+                    <div class="box-lid"></div>
+                    <div class="box-body">
+                        <div class="ribbon ribbon-vertical"></div>
+                        <div class="ribbon ribbon-horizontal"></div>
+                        <span class="box-number">{{ position.id }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2><i class="fas fa-trophy"></i> Ваши подарки</h2>
+            <div id="giftsContainer" class="gifts-container">
+                <p class="empty-message">Откройте первую коробку, чтобы увидеть подарок!</p>
+            </div>
+        </div>
+
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-gift"></i> Поздравление!</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="giftImage" class="gift-image"></div>
+                    <p id="congratMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()" class="modal-btn">Закрыть</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <p><i class="fas fa-snowflake"></i> С Новым Годом! Пусть все ваши желания сбудутся! <i class="fas fa-snowflake"></i></p>
+        </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025, Фомченко ФБИ-34</p>
-    </footer>
-
     <script src="{{ url_for('static', filename='js/lab9.js') }}"></script>
+    <script>
+        function openBox(boxId) {
+            fetch('/lab9/api/open_box', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ box_id: boxId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('openedCount').textContent = data.opened_count;
+                    document.getElementById('remainingCount').textContent = data.remaining_boxes;
+                    
+                    document.getElementById('congratMessage').textContent = data.message;
+                    document.getElementById('giftImage').innerHTML = `<span style="font-size: 4rem;">${data.gift}</span>`;
+                    
+                    document.getElementById('messageModal').style.display = 'flex';
+                    
+                    const box = document.getElementById(`box-${boxId}`);
+                    box.classList.add('opened');
+                    box.onclick = null;
+                    
+                    addGiftToCollection(boxId, data.message, data.gift);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при открытии коробки');
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+        
+        function addGiftToCollection(boxId, message, gift) {
+            const container = document.getElementById('giftsContainer');
+            const emptyMessage = container.querySelector('.empty-message');
+            
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            const giftCard = document.createElement('div');
+            giftCard.className = 'gift-card';
+            giftCard.innerHTML = `
+                <h3><i class="fas fa-gift"></i> Подарок #${boxId}</h3>
+                <div class="gift-card-img">
+                    <span style="font-size: 3rem;">${gift}</span>
+                </div>
+                <p><strong>Поздравление:</strong> ${message}</p>
+                <p class="small"><i class="fas fa-calendar"></i> Открыто сегодня</p>
+            `;
+            
+            container.appendChild(giftCard);
+        }
+        
+        function resetGame() {
+            if (confirm('Вы уверены, что хотите сбросить игру? Все ваши открытые подарки будут потеряны.')) {
+                fetch('/lab9/reset', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            }
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('messageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/lab9/api/get_state')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('openedCount').textContent = data.opened_count;
+                    document.getElementById('remainingCount').textContent = data.remaining_boxes;
+                    
+                    data.opened_boxes.forEach(boxId => {
+                        const box = document.getElementById(`box-${boxId}`);
+                        if (box) {
+                            box.classList.add('opened');
+                            box.onclick = null;
+                        }
+                    });
+                });
+        });
+    </script>
 </body>
 </html>
