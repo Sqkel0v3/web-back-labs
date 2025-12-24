@@ -1,19 +1,31 @@
-{% extends "rgz/base.html" %}
-{% block title %}Вход{% endblock %}
-{% block content %}
+{% extends "base.html" %}
 
-<h2>Вход</h2>
+{% block lab %}Лабораторная работа 8{% endblock %}
 
-<form method="post" action="{{ url_for('rgz.login') }}">
-    <label>Логин:</label>
-    <input type="text" name="username" required>
+{% block main %}
+<h1>Вход в систему</h1>
 
-    <label>Пароль:</label>
-    <input type="password" name="password" required>
+{% if error %}
+<div style="color: red; margin-bottom: 15px;">
+    {{ error }}
+</div>
+{% endif %}
 
-    <button class="button">Войти</button>
+<form action="/lab8/login" method="post">
+    <div>
+        <label>
+            Логин: <input type="text" name="login" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Пароль: <input type="password" name="password" required>
+        </label>
+    </div>
+
+    <button type="submit">Вход</button>
 </form>
-
 {% endblock %}
 
 

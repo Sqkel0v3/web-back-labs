@@ -71,26 +71,35 @@ def login():
     if request.method == 'GET':
         return render_template('lab8/login.html')
     
-    login_form = request.form.get('login')
-    password_form = request.form.get('password')
+    try:
+        login_form = request.form.get('login')
+        password_form = request.form.get('password')
+        
+        if not login_form or not password_form:
+            flash('Логин и пароль не могут быть пустыми', 'error')
+            return render_template('lab8/login.html')
+        
+        user = users.query.filter_by(login=login_form).first()
+        
+        if not user:
+            flash('Пользователь не найден', 'error')
+            return render_template('lab8/login.html')
+        
+        if not check_password_hash(user.password, password_form):
+            flash('Неверный пароль', 'error')
+            return render_template('lab8/login.html')
+        
+        session['user_id'] = user.id
+        session.permanent = True
+        
+        flash('Вы успешно вошли в систему!', 'success')
+        return redirect('/lab8/')
+        
+    except Exception as e:
+        current_app.logger.error(f'Ошибка при входе: {str(e)}')
+        flash(f'Ошибка при входе: {str(e)}', 'error')
+        return render_template('lab8/login.html')
     
-    if not login_form or not password_form:
-        return render_template('lab8/login.html', 
-                              error='Логин и пароль не могут быть пустыми')
-    
-    user = users.query.filter_by(login=login_form).first()
-    
-    if not user:
-        return render_template('lab8/login.html', 
-                              error='Пользователь не найден')
-    
-    if not check_password_hash(user.password, password_form):
-        return render_template('lab8/login.html', 
-                              error='Неверный пароль')
-    
-    session['user_id'] = user.id
-    return redirect('/lab8/')
-
 @lab8.route('/articles')
 def articles_list():
     try:
