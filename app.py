@@ -2,7 +2,6 @@ from flask import Flask, request, render_template_string
 import datetime
 from os import path
 import os
-# from flask_sqlalchemy import SQLAlchemy  # УДАЛИТЬ
 from db import db
 from dotenv import load_dotenv
 
