@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статьи - Лабораторная 8</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -21,6 +22,31 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .flashes {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
         }
         
         .header {
@@ -59,6 +85,7 @@
             text-decoration: none;
             font-weight: 500;
             display: inline-block;
+            cursor: pointer;
         }
         
         .btn:hover {
@@ -215,6 +242,19 @@
     </style>
 </head>
 <body>
+    <!-- Флеш-сообщения -->
+    <div class="flashes">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <div class="container">
         <header class="header">
             <div class="header-content">
@@ -258,7 +298,9 @@
                         <small>ID: {{ article.id }}</small>
                         <div class="article-actions">
                             <a href="{{ url_for('lab8.edit_article', article_id=article.id) }}" class="btn">✏️</a>
-                            <a href="{{ url_for('lab8.delete_article', article_id=article.id) }}" class="btn" onclick="return confirm('Удалить статью?')">🗑️</a>
+                            <form action="{{ url_for('lab8.delete_article', article_id=article.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn" onclick="return confirm('Удалить статью?')">🗑️</button>
+                            </form>
                             <a href="{{ url_for('lab8.like_article', article_id=article.id) }}" class="btn">👍</a>
                         </div>
                     </div>
@@ -304,7 +346,6 @@
         </section>
         
         <div class="navigation">
-            <a href="{{ url_for('lab8.search_articles') }}" class="btn">🔍 Поиск статей</a>
             <a href="{{ url_for('lab8.index') }}" class="btn">На главную</a>
             {% if session['user_id'] %}
             <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать статью</a>
@@ -313,9 +354,17 @@
     </div>
     
     <script>
-        function confirmDelete(articleId) {
-            return confirm('Вы уверены, что хотите удалить эту статью?');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Добавляем обработчик для форм удаления
+            const deleteForms = document.querySelectorAll('form[action*="delete_article"]');
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!confirm('Вы уверены, что хотите удалить эту статью?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

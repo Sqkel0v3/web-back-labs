@@ -1,17 +1,20 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, flash, redirect, url_for
+from flask_login import LoginManager
 import datetime
 from os import path
 import os
 from db import db
 from dotenv import load_dotenv
-from flask_login import LoginManager
 
 load_dotenv()
 
 app = Flask(__name__)
 
+# ========== КОНФИГУРАЦИЯ ==========
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'sqlite')
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)  # 7 дней для "запомнить меня"
+app.config['SESSION_PERMANENT'] = True
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'roman_fomchenko_orm'
@@ -31,6 +34,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+# ========== НАСТРОЙКА FLASK-LOGIN ==========
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'lab8.login'
@@ -42,8 +46,7 @@ def load_user(user_id):
     from db.models import users
     return users.query.get(int(user_id))
 
-count = 0
-
+# ========== ГЛАВНАЯ СТРАНИЦА ==========
 @app.route("/")
 @app.route("/index")
 def index():
@@ -123,11 +126,12 @@ def index():
             border-left: 4px solid #3498db;
         }
     </style>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>HГТУ, ФБ, WEB-программирование, часть 2</h1>
+            <h1>НГТУ, ФБ, WEB-программирование, часть 2</h1>
             <p>Список лабораторных работ</p>
         </header>
 
@@ -153,18 +157,7 @@ def index():
 </body>
 </html>"""
 
-# УДАЛИ ЭТУ ФУНКЦИЮ, ОНА ДУБЛИРУЕТ ГЛАВНУЮ:
-# @app.route('/start')
-# def start():
-#     return '''
-#     <html>
-#     <body>
-#         <h1>Главная</h1>
-#         <a href="/lab3/">Лабораторная 3</a>
-#     </body>
-#     </html>
-#     '''
-
+# ========== 404 ОШИБКА ==========
 error_404_log = []
 
 @app.errorhandler(404)
@@ -367,6 +360,7 @@ def not_found(err):
             border: 5px solid #fff;
         }}
     </style>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="container">
@@ -416,8 +410,7 @@ def not_found(err):
 </body>
 </html>""", 404
 
-from flask import render_template_string
-
+# ========== 500 ОШИБКА ==========
 @app.route("/error/500")
 def cause_error():
     result = 10 / 0
@@ -538,6 +531,7 @@ def internal_server_error(err):
             margin-top: 0;
         }
     </style>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="container">
@@ -566,9 +560,7 @@ def internal_server_error(err):
 </html>
 """, error_message=error_message), 500
 
-# ========== ТЕПЕРЬ ИМПОРТИРУЕМ Blueprint'ы ==========
-# ВСЕГДА В САМОМ КОНЦЕ ФАЙЛА!
-
+# ========== ИМПОРТ Blueprint'ов ==========
 try:
     from lab1 import lab1
     from lab2 import lab2
@@ -581,7 +573,6 @@ try:
     from lab9 import lab9
     from rgz import rgz
     
-    # Регистрируем Blueprint'ы с префиксами
     app.register_blueprint(lab1, url_prefix='/lab1')
     app.register_blueprint(lab2, url_prefix='/lab2')
     app.register_blueprint(lab3, url_prefix='/lab3')

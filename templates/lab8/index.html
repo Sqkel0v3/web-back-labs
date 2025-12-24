@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лабораторная работа 8</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -22,6 +23,37 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .flashes {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .flash-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
         }
 
         .header {
@@ -343,6 +375,18 @@
     </style>
 </head>
 <body>
+    <div class="flashes">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <div class="container">
         <header class="header">
             <div class="header-content">
@@ -447,7 +491,6 @@
                     <li>Просматривайте статьи через "Список статей"</li>
                     <li>Создавайте новые статьи через "Создать статью" (требуется авторизация)</li>
                     <li>Добавляйте статьи в "Избранное" для быстрого доступа</li>
-                    <li>Ищите статьи по ключевым словам через "Поиск статей"</li>
                 </ol>
             </div>
             
@@ -493,9 +536,6 @@
         <footer class="footer">
             <p>© 2025 Лабораторная работа 8. Все права защищены.</p>
             <p>Система управления статьями | Flask + SQLAlchemy | Пользователь: {{ username }}</p>
-            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #888;">
-                База данных: {{ 'SQLite' if 'sqlite' in config.SQLALCHEMY_DATABASE_URI else 'PostgreSQL' }}
-            </p>
         </footer>
     </div>
 

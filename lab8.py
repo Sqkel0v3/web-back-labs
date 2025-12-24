@@ -3,8 +3,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from db import db
 from db.models import users, articles
+from functools import wraps
 
 lab8 = Blueprint('lab8', __name__, template_folder='templates')
+
+# ========== ДЕКОРАТОР ДЛЯ ПРОВЕРКИ АВТОРИЗАЦИИ ==========
+def login_required_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Для доступа к этой странице необходимо войти в систему', 'error')
+            return redirect('/lab8/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @lab8.route('/')
 def index():
@@ -19,7 +31,9 @@ def index():
     
     return render_template('lab8/index.html', 
                           username=username, 
-                          user_articles=user_articles)
+                          user_articles=user_articles,
+                          config={'SQLALCHEMY_DATABASE_URI': 'sqlite:///roman_fomchenko_orm.db'})
+
 
 @lab8.route('/register', methods=['GET', 'POST'])
 def register():
@@ -58,14 +72,18 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         
+        # ✅ АВТОМАТИЧЕСКИЙ ЛОГИН ПОСЛЕ РЕГИСТРАЦИИ
         session['user_id'] = new_user.id
-        flash('Регистрация успешна! Добро пожаловать!', 'success')
+        login_user(new_user, remember=False)
+        
+        flash('Регистрация успешна! Вы автоматически вошли в систему.', 'success')
         return redirect('/lab8/')
         
     except Exception as e:
         db.session.rollback()
         flash(f'Ошибка при регистрации: {str(e)}', 'error')
         return render_template('lab8/register.html')
+
 
 @lab8.route('/login', methods=['GET', 'POST'])
 def login():
@@ -74,6 +92,7 @@ def login():
     
     login_form = request.form.get('login')
     password_form = request.form.get('password')
+    remember_me = 'remember' in request.form  # ✅ ГАЛОЧКА "ЗАПОМНИТЬ МЕНЯ"
     
     if not login_form or not password_form:
         flash('Логин и пароль не могут быть пустыми', 'error')
@@ -89,13 +108,20 @@ def login():
         flash('Неверный пароль', 'error')
         return render_template('lab8/login.html')
     
-    login_user(user, remember=False)  
+    # ✅ ИСПОЛЬЗУЕМ ПАРАМЕТР REMEMBER ИЗ ФОРМЫ
+    login_user(user, remember=remember_me)  
     session['user_id'] = user.id
-
+    
+    # Делаем сессию постоянной если галочка установлена
+    if remember_me:
+        session.permanent = True
+    
     flash('Вы успешно вошли в систему!', 'success')
     return redirect('/lab8/')
-    
+
+
 @lab8.route('/articles')
+@login_required_decorator  # ✅ ЗАЩИЩАЕМ ДОСТУП
 def articles_list():
     try:
         public_articles = articles.query.filter_by(is_public=True).all()
@@ -113,11 +139,10 @@ def articles_list():
                           public_articles=public_articles,
                           user_articles=user_articles)
 
+
 @lab8.route('/create', methods=['GET', 'POST'])
+@login_required_decorator  # ✅ ЗАЩИЩАЕМ ДОСТУП
 def create_article():
-    if 'user_id' not in session:
-        return redirect('/lab8/login')
-    
     if request.method == 'GET':
         return render_template('lab8/create.html')
     
@@ -147,20 +172,21 @@ def create_article():
         db.session.add(new_article)
         db.session.commit()
         
+        flash('Статья успешно создана!', 'success')
         return redirect('/lab8/articles')
     except Exception as e:
         return render_template('lab8/create.html', 
                               error=f'Ошибка сохранения: {str(e)}')
 
+
 @lab8.route('/edit/<int:article_id>', methods=['GET', 'POST'])
+@login_required_decorator  # ✅ ЗАЩИЩАЕМ ДОСТУП
 def edit_article(article_id):
-    if 'user_id' not in session:
-        return redirect('/lab8/login')
-    
     try:
         article = articles.query.get_or_404(article_id)
         
         if article.login_id != session['user_id']:
+            flash('Вы не можете редактировать чужую статью', 'error')
             return redirect('/lab8/articles')
         
         if request.method == 'GET':
@@ -183,27 +209,32 @@ def edit_article(article_id):
         
         db.session.commit()
         
+        flash('Статья успешно обновлена!', 'success')
         return redirect('/lab8/articles')
     except:
+        flash('Ошибка при редактировании статьи', 'error')
         return redirect('/lab8/articles')
 
+
 @lab8.route('/delete/<int:article_id>')
+@login_required_decorator  # ✅ ЗАЩИЩАЕМ ДОСТУП
 def delete_article(article_id):
-    if 'user_id' not in session:
-        return redirect('/lab8/login')
-    
     try:
         article = articles.query.get_or_404(article_id)
         
         if article.login_id != session['user_id']:
+            flash('Вы не можете удалить чужую статью', 'error')
             return redirect('/lab8/articles')
         
         db.session.delete(article)
         db.session.commit()
         
+        flash('Статья успешно удалена!', 'success')
         return redirect('/lab8/articles')
     except:
+        flash('Ошибка при удалении статьи', 'error')
         return redirect('/lab8/articles')
+
 
 @lab8.route('/like/<int:article_id>')
 def like_article(article_id):
@@ -211,16 +242,16 @@ def like_article(article_id):
         article = articles.query.get_or_404(article_id)
         article.likes = article.likes + 1
         db.session.commit()
+        flash('Статья оценена!', 'success')
     except:
-        pass
+        flash('Ошибка при оценке статьи', 'error')
     
     return redirect('/lab8/articles')
 
+
 @lab8.route('/favorites')
+@login_required_decorator
 def favorites():
-    if 'user_id' not in session:
-        return redirect('/lab8/login')
-    
     try:
         favorite_articles = articles.query.filter_by(
             login_id=session['user_id'],
@@ -232,13 +263,15 @@ def favorites():
     return render_template('lab8/favorites.html', 
                           favorite_articles=favorite_articles)
 
+
 @lab8.route('/logout')
-@login_required
 def logout():
     logout_user()
     session.pop('user_id', None)
+    session.permanent = False
     flash('Вы успешно вышли из системы', 'success')
     return redirect('/lab8/')
+
 
 @lab8.route('/test')
 def test():
