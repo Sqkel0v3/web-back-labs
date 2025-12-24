@@ -17,7 +17,6 @@ with app.app_context():
     print("Создание таблиц...")
     db.create_all()
     
-    # Создаем тестового пользователя
     user_count = users.query.count()
     if user_count == 0:
         test_user = users(

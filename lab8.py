@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, login_required, current_user
 from db import db
 from db.models import users, articles
 
@@ -71,34 +72,28 @@ def login():
     if request.method == 'GET':
         return render_template('lab8/login.html')
     
-    try:
-        login_form = request.form.get('login')
-        password_form = request.form.get('password')
-        
-        if not login_form or not password_form:
-            flash('Логин и пароль не могут быть пустыми', 'error')
-            return render_template('lab8/login.html')
-        
-        user = users.query.filter_by(login=login_form).first()
-        
-        if not user:
-            flash('Пользователь не найден', 'error')
-            return render_template('lab8/login.html')
-        
-        if not check_password_hash(user.password, password_form):
-            flash('Неверный пароль', 'error')
-            return render_template('lab8/login.html')
-        
-        session['user_id'] = user.id
-        session.permanent = True
-        
-        flash('Вы успешно вошли в систему!', 'success')
-        return redirect('/lab8/')
-        
-    except Exception as e:
-        current_app.logger.error(f'Ошибка при входе: {str(e)}')
-        flash(f'Ошибка при входе: {str(e)}', 'error')
+    login_form = request.form.get('login')
+    password_form = request.form.get('password')
+    
+    if not login_form or not password_form:
+        flash('Логин и пароль не могут быть пустыми', 'error')
         return render_template('lab8/login.html')
+    
+    user = users.query.filter_by(login=login_form).first()
+    
+    if not user:
+        flash('Пользователь не найден', 'error')
+        return render_template('lab8/login.html')
+    
+    if not check_password_hash(user.password, password_form):
+        flash('Неверный пароль', 'error')
+        return render_template('lab8/login.html')
+    
+    login_user(user, remember=False)  
+    session['user_id'] = user.id
+
+    flash('Вы успешно вошли в систему!', 'success')
+    return redirect('/lab8/')
     
 @lab8.route('/articles')
 def articles_list():
@@ -238,34 +233,13 @@ def favorites():
                           favorite_articles=favorite_articles)
 
 @lab8.route('/logout')
+@login_required
 def logout():
+    logout_user()
     session.pop('user_id', None)
+    flash('Вы успешно вышли из системы', 'success')
     return redirect('/lab8/')
 
-@lab8.route('/search', methods=['GET', 'POST'])
-def search_articles():
-    if request.method == 'GET':
-        return render_template('lab8/search.html')
-    
-    search_query = request.form.get('query', '')
-    
-    if not search_query:
-        return render_template('lab8/search.html', 
-                              error='Введите поисковый запрос')
-    
-    try:
-        found_articles = articles.query.filter(
-            (articles.title.contains(search_query)) | 
-            (articles.article_text.contains(search_query))
-        ).filter_by(is_public=True).all()
-    except:
-        found_articles = []
-    
-    return render_template('lab8/search.html', 
-                          search_query=search_query,
-                          found_articles=found_articles)
-
-# Тестовый маршрут для проверки
 @lab8.route('/test')
 def test():
     return '✅ Лабораторная работа 8 работает!'

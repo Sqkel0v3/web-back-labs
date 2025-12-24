@@ -4,13 +4,14 @@ from os import path
 import os
 from db import db
 from dotenv import load_dotenv
+from flask_login import LoginManager
 
 load_dotenv()
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
-app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'sqlite')  # Изменил на sqlite по умолчанию
+app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'sqlite')
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'roman_fomchenko_orm'
@@ -28,17 +29,18 @@ else:
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Инициализируем базу данных с приложением
 db.init_app(app)
 
-# УДАЛИ ЭТИ СТРОКИ ИЗ СЕРЕДИНЫ:
-# from lab1 import lab1
-# from lab2 import lab2
-# ... и все остальные импорты lab*
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'lab8.login'
+login_manager.login_message = 'Для доступа к этой странице необходимо войти в систему'
+login_manager.login_message_category = 'error'
 
-# ... остальной код (обработчики ошибок, маршруты) ...
-
-# ВСЕ ИМПОРТЫ LAB ПЕРЕНОСИМ В КОНЕЦ!
+@login_manager.user_loader
+def load_user(user_id):
+    from db.models import users
+    return users.query.get(int(user_id))
 
 count = 0
 
