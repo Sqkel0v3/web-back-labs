@@ -10,7 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
-app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
+app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'sqlite')  # Изменил на sqlite по умолчанию
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'roman_fomchenko_orm'
@@ -31,33 +31,137 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Инициализируем базу данных с приложением
 db.init_app(app)
 
-# Импортируем и регистрируем Blueprints ПОСЛЕ инициализации db
-from lab1 import lab1
-from lab2 import lab2
-from lab3 import lab3
-from lab4 import lab4
-from lab5 import lab5
-from lab6 import lab6
-from lab7 import lab7
-from lab8 import lab8
-from lab9 import lab9
-from rgz import rgz
-
-app.register_blueprint(lab1)
-app.register_blueprint(lab2)
-app.register_blueprint(lab3)
-app.register_blueprint(lab4)
-app.register_blueprint(lab5)
-app.register_blueprint(lab6)
-app.register_blueprint(lab7)
-app.register_blueprint(lab8)
-app.register_blueprint(lab9)
-app.register_blueprint(rgz)
+# УДАЛИ ЭТИ СТРОКИ ИЗ СЕРЕДИНЫ:
+# from lab1 import lab1
+# from lab2 import lab2
+# ... и все остальные импорты lab*
 
 # ... остальной код (обработчики ошибок, маршруты) ...
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# ВСЕ ИМПОРТЫ LAB ПЕРЕНОСИМ В КОНЕЦ!
+
+count = 0
+
+@app.route("/")
+@app.route("/index")
+def index():
+    return """<!doctype html>
+<html>
+<head>
+    <title>НГТУ, ФБ, Лабораторные работы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+        }
+        nav {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        nav li {
+            margin: 10px 0;
+        }
+        nav a {
+            display: block;
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+        nav a:hover {
+            background: #2980b9;
+            transform: translateX(5px);
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: #34495e;
+            color: white;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            margin: 30px -30px -30px -30px;
+        }
+        .lab-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HГТУ, ФБ, WEB-программирование, часть 2</h1>
+            <p>Список лабораторных работ</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="/lab1">Первая лабораторная</a></li>
+                <li><a href="/lab2">Вторая лабораторная</a></li>
+                <li><a href="/lab3">Третья лабораторная</a></li>
+                <li><a href="/lab4">Четвертая лабораторная</a></li>
+                <li><a href="/lab5">Пятая лабораторная</a></li>
+                <li><a href="/lab6">Шестая лабораторная</a></li>
+                <li><a href="/lab7">Седьмая лабораторная</a></li>
+                <li><a href="/lab8">Восьмая лабораторная</a></li>
+                <li><a href="/lab9">Девятая лабораторная</a></li>
+                <li><a href="/rgz">РГЗ</a></li>
+            </ul>
+        </nav>
+        
+        <footer>
+            <p>ФБИ-34, 3 курс, 2025</p>
+        </footer>
+    </div>
+</body>
+</html>"""
+
+# УДАЛИ ЭТУ ФУНКЦИЮ, ОНА ДУБЛИРУЕТ ГЛАВНУЮ:
+# @app.route('/start')
+# def start():
+#     return '''
+#     <html>
+#     <body>
+#         <h1>Главная</h1>
+#         <a href="/lab3/">Лабораторная 3</a>
+#     </body>
+#     </html>
+#     '''
 
 error_404_log = []
 
@@ -460,125 +564,37 @@ def internal_server_error(err):
 </html>
 """, error_message=error_message), 500
 
-count = 0
+# ========== ТЕПЕРЬ ИМПОРТИРУЕМ Blueprint'ы ==========
+# ВСЕГДА В САМОМ КОНЦЕ ФАЙЛА!
 
-@app.route("/")
-@app.route("/index")
-def index():
-    return """<!doctype html>
-<html>
-<head>
-    <title>НГТУ, ФБ, Лабораторные работы</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        header {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
-            margin: -30px -30px 30px -30px;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.2em;
-        }
-        nav {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        nav li {
-            margin: 10px 0;
-        }
-        nav a {
-            display: block;
-            padding: 12px 20px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.3s ease;
-            font-weight: bold;
-        }
-        nav a:hover {
-            background: #2980b9;
-            transform: translateX(5px);
-        }
-        footer {
-            margin-top: 40px;
-            padding: 20px;
-            background: #34495e;
-            color: white;
-            text-align: center;
-            border-radius: 0 0 10px 10px;
-            margin: 30px -30px -30px -30px;
-        }
-        .lab-list {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>HГТУ, ФБ, WEB-программирование, часть 2</h1>
-            <p>Список лабораторных работ</p>
-        </header>
+try:
+    from lab1 import lab1
+    from lab2 import lab2
+    from lab3 import lab3
+    from lab4 import lab4
+    from lab5 import lab5
+    from lab6 import lab6
+    from lab7 import lab7
+    from lab8 import lab8
+    from lab9 import lab9
+    from rgz import rgz
+    
+    # Регистрируем Blueprint'ы с префиксами
+    app.register_blueprint(lab1, url_prefix='/lab1')
+    app.register_blueprint(lab2, url_prefix='/lab2')
+    app.register_blueprint(lab3, url_prefix='/lab3')
+    app.register_blueprint(lab4, url_prefix='/lab4')
+    app.register_blueprint(lab5, url_prefix='/lab5')
+    app.register_blueprint(lab6, url_prefix='/lab6')
+    app.register_blueprint(lab7, url_prefix='/lab7')
+    app.register_blueprint(lab8, url_prefix='/lab8')
+    app.register_blueprint(lab9, url_prefix='/lab9')
+    app.register_blueprint(rgz, url_prefix='/rgz')
+    
+    print("✅ Все Blueprint'ы успешно загружены")
+except ImportError as e:
+    print(f"⚠️  Не удалось загрузить Blueprint: {e}")
+    print("Работаем без лабораторных работ")
 
-        <nav>
-            <ul>
-                <li><a href="/lab1">Первая лабораторная</a></li>
-                <li><a href="/lab2">Вторая лабораторная</a></li>
-                <li><a href="/lab3">Третья лабораторная</a></li>
-                <li><a href="/lab4">Четвертая лабораторная</a></li>
-                <li><a href="/lab5">Пятая лабораторная</a></li>
-                <li><a href="/lab6">Шестая лабораторная</a></li>
-                <li><a href="/lab7">Седьмая лабораторная</a></li>
-                <li><a href="/lab8">Восьмая лабораторная</a></li>
-                 <li><a href="/lab9">Девятая лабораторная</a></li>
-                <li><a href="/rgz">РГЗ</a></li>
-            </ul>
-        </nav>
-        
-        <footer>
-            <p>ФБИ-34, 3 курс, 2025</p>
-        </footer>
-    </div>
-</body>
-</html>"""
-
-@app.route('/')
-@app.route('/start')
-def start():
-    return '''
-    <html>
-    <body>
-        <h1>Главная</h1>
-        <a href="/lab3/">Лабораторная 3</a>
-    </body>
-    </html>
-    '''
+if __name__ == '__main__':
+    app.run(debug=True)

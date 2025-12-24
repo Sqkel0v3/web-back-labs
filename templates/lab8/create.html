@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать статью - Лабораторная 8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .create-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .create-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .create-header h1 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .links {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        .char-counter {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="create-container">
+        <div class="create-header">
+            <h1>Создать статью</h1>
+            <p>Напишите новую статью</p>
+        </div>
+        
+        {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Заголовок (макс. 50 символов):</label>
+                <input type="text" id="title" name="title" required 
+                       maxlength="50" value="{{ request.form.title if request.form }}">
+                <div class="char-counter">
+                    <span id="title-counter">0</span>/50
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="article_text">Текст статьи:</label>
+                <textarea id="article_text" name="article_text" required>{{ request.form.article_text if request.form }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_favorite" name="is_favorite" 
+                           {% if request.form and 'is_favorite' in request.form %}checked{% endif %}>
+                    <label for="is_favorite">Добавить в избранное</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_public" name="is_public" checked
+                           {% if not request.form or (request.form and 'is_public' in request.form) %}checked{% endif %}>
+                    <label for="is_public">Сделать статью публичной</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Опубликовать статью</button>
+        </form>
+        
+        <div class="links">
+            <p><a href="{{ url_for('lab8.articles_list') }}">Посмотреть все статьи</a></p>
+            <p><a href="{{ url_for('lab8.index') }}">Вернуться на главную</a></p>
+        </div>
+    </div>
+    
+    <script>
+        const titleInput = document.getElementById('title');
+        const titleCounter = document.getElementById('title-counter');
+        
+        titleInput.addEventListener('input', function() {
+            titleCounter.textContent = this.value.length;
+        });
+        
+        titleCounter.textContent = titleInput.value.length;
+    </script>
+</body>
+</html>

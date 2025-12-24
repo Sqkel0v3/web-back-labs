@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа 8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .user-info .btn {
+            display: inline-block;
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .user-info .btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .user-info .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .user-info .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .user-info .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .user-info .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .nav-links {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-links h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .nav-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-height: 120px;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-card.disabled {
+            background: linear-gradient(135deg, #cccccc 0%, #999999 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .nav-card.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-card i {
+            font-size: 1.5rem;
+        }
+
+        .nav-card-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-card-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .content h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .user-articles {
+            margin-top: 2rem;
+        }
+
+        .article-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .article-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .article-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .article-item h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-item p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-favorite {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-public {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-private {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-articles {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .instructions h3 {
+            color: #764ba2;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .user-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            
+            .user-info .btn {
+                margin: 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .article-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Лабораторная работа 8</h1>
+                <p>Система аутентификации и управления статьями</p>
+                
+                <div class="user-info">
+                    Пользователь: <strong>{{ username }}</strong>
+                    {% if username != 'anonymous' %}
+                        <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать статью</a>
+                        <a href="{{ url_for('lab8.articles_list') }}" class="btn">Мои статьи</a>
+                        <a href="{{ url_for('lab8.favorites') }}" class="btn">Избранное</a>
+                        <a href="{{ url_for('lab8.logout') }}" class="btn btn-danger">Выйти</a>
+                    {% else %}
+                        <a href="{{ url_for('lab8.login') }}" class="btn">Войти</a>
+                        <a href="{{ url_for('lab8.register') }}" class="btn btn-primary">Зарегистрироваться</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <section class="nav-links">
+            <h2>Навигация по системе</h2>
+            <div class="nav-grid">
+                <a href="{{ url_for('lab8.login') }}" class="nav-card">
+                    <div class="icon">🔐</div>
+                    <div class="nav-card-content">
+                        <h3>Вход в систему</h3>
+                        <p>Авторизация существующего пользователя</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.register') }}" class="nav-card">
+                    <div class="icon">📝</div>
+                    <div class="nav-card-content">
+                        <h3>Регистрация</h3>
+                        <p>Создание нового аккаунта</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.articles_list') }}" class="nav-card">
+                    <div class="icon">📰</div>
+                    <div class="nav-card-content">
+                        <h3>Список статей</h3>
+                        <p>Просмотр всех публичных статей</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.create_article') if username != 'anonymous' else '#' }}" 
+                   class="nav-card {% if username == 'anonymous' %}disabled{% endif %}">
+                    <div class="icon">✏️</div>
+                    <div class="nav-card-content">
+                        <h3>Создать статью</h3>
+                        <p>Написание новой статьи</p>
+                        {% if username == 'anonymous' %}
+                        <small style="color: rgba(255,255,255,0.7);">Требуется авторизация</small>
+                        {% endif %}
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.favorites') if username != 'anonymous' else '#' }}" 
+                   class="nav-card {% if username == 'anonymous' %}disabled{% endif %}">
+                    <div class="icon">⭐</div>
+                    <div class="nav-card-content">
+                        <h3>Избранное</h3>
+                        <p>Избранные статьи пользователя</p>
+                        {% if username == 'anonymous' %}
+                        <small style="color: rgba(255,255,255,0.7);">Требуется авторизация</small>
+                        {% endif %}
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.search_articles') }}" class="nav-card">
+                    <div class="icon">🔍</div>
+                    <div class="nav-card-content">
+                        <h3>Поиск статей</h3>
+                        <p>Поиск по заголовку и содержимому</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <main class="content">
+            <h2>Добро пожаловать в лабораторную работу 8!</h2>
+            <p>Эта лабораторная работа посвящена созданию системы аутентификации и управления статьями с использованием Flask и SQLAlchemy ORM.</p>
+            
+            {% if username != 'anonymous' %}
+            <div class="stats">
+                <div class="stat-card">
+                    <h4>Ваши статьи</h4>
+                    <div class="stat-number">{{ user_articles|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Избранные</h4>
+                    <div class="stat-number">{{ user_articles|selectattr('is_favorite')|list|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Публичные</h4>
+                    <div class="stat-number">{{ user_articles|selectattr('is_public')|list|length }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="instructions">
+                <h3>Инструкция по использованию:</h3>
+                <ol>
+                    <li>Для входа в систему используйте ссылку "Вход"</li>
+                    <li>Для создания нового аккаунта используйте ссылку "Регистрация"</li>
+                    <li>Просматривайте статьи через "Список статей"</li>
+                    <li>Создавайте новые статьи через "Создать статью" (требуется авторизация)</li>
+                    <li>Добавляйте статьи в "Избранное" для быстрого доступа</li>
+                    <li>Ищите статьи по ключевым словам через "Поиск статей"</li>
+                </ol>
+            </div>
+            
+            {% if username != 'anonymous' and user_articles %}
+            <div class="user-articles">
+                <h3>Ваши последние статьи:</h3>
+                <div class="article-list">
+                    {% for article in user_articles[:3] %}
+                    <div class="article-item">
+                        <h4>{{ article.title }}</h4>
+                        <p>{{ article.article_text[:100] }}{% if article.article_text|length > 100 %}...{% endif %}</p>
+                        <div class="article-meta">
+                            <div>
+                                {% if article.is_favorite %}
+                                <span class="badge badge-favorite">★ Избранная</span>
+                                {% endif %}
+                                {% if article.is_public %}
+                                <span class="badge badge-public">🌐 Публичная</span>
+                                {% else %}
+                                <span class="badge badge-private">🔒 Приватная</span>
+                                {% endif %}
+                            </div>
+                            <div>❤️ {{ article.likes }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if user_articles|length > 3 %}
+                <p style="text-align: center; margin-top: 1rem;">
+                    <a href="{{ url_for('lab8.articles_list') }}" style="color: #667eea; text-decoration: none;">
+                        Показать все статьи ({{ user_articles|length }}) →
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+            {% elif username != 'anonymous' %}
+            <div class="no-articles">
+                <p>У вас пока нет статей. <a href="{{ url_for('lab8.create_article') }}" style="color: #667eea;">Создайте первую статью!</a></p>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>© 2025 Лабораторная работа 8. Все права защищены.</p>
+            <p>Система управления статьями | Flask + SQLAlchemy | Пользователь: {{ username }}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #888;">
+                База данных: {{ 'SQLite' if 'sqlite' in config.SQLALCHEMY_DATABASE_URI else 'PostgreSQL' }}
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.nav-card:not(.disabled)');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
