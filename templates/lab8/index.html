@@ -342,6 +342,43 @@
             color: #764ba2;
         }
 
+        .public-articles {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .public-articles h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .author-info {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-link:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
             .nav-grid {
                 grid-template-columns: 1fr;
@@ -399,10 +436,12 @@
                         <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать статью</a>
                         <a href="{{ url_for('lab8.articles_list') }}" class="btn">Мои статьи</a>
                         <a href="{{ url_for('lab8.favorites') }}" class="btn">Избранное</a>
+                        <a href="{{ url_for('lab8.search_articles') }}" class="btn">🔍 Поиск</a>
                         <a href="{{ url_for('lab8.logout') }}" class="btn btn-danger">Выйти</a>
                     {% else %}
                         <a href="{{ url_for('lab8.login') }}" class="btn">Войти</a>
                         <a href="{{ url_for('lab8.register') }}" class="btn btn-primary">Зарегистрироваться</a>
+                        <a href="{{ url_for('lab8.search_articles') }}" class="btn">🔍 Поиск статей</a>
                     {% endif %}
                 </div>
             </div>
@@ -432,6 +471,14 @@
                     <div class="nav-card-content">
                         <h3>Список статей</h3>
                         <p>Просмотр всех публичных статей</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('lab8.search_articles') }}" class="nav-card">
+                    <div class="icon">🔍</div>
+                    <div class="nav-card-content">
+                        <h3>Поиск статей</h3>
+                        <p>Поиск по всем публичным статьям</p>
                     </div>
                 </a>
                 
@@ -489,10 +536,48 @@
                     <li>Для входа в систему используйте ссылку "Вход"</li>
                     <li>Для создания нового аккаунта используйте ссылку "Регистрация"</li>
                     <li>Просматривайте статьи через "Список статей"</li>
+                    <li>Ищите статьи по ключевым словам через "Поиск статей"</li>
                     <li>Создавайте новые статьи через "Создать статью" (требуется авторизация)</li>
                     <li>Добавляйте статьи в "Избранное" для быстрого доступа</li>
                 </ol>
             </div>
+            
+            {% if public_articles %}
+            <div class="public-articles">
+                <h3>Последние публичные статьи:</h3>
+                <div class="article-list">
+                    {% for article in public_articles[:3] %}
+                    <div class="article-item">
+                        <h4>{{ article.title }}</h4>
+                        <p>{{ article.article_text[:100] }}{% if article.article_text|length > 100 %}...{% endif %}</p>
+                        <div class="article-meta">
+                            <div>
+                                {% if article.is_favorite %}
+                                <span class="badge badge-favorite">★ Избранная</span>
+                                {% endif %}
+                                <span class="badge badge-public">🌐 Публичная</span>
+                            </div>
+                            <div>❤️ {{ article.likes }}</div>
+                        </div>
+                        <div class="author-info">
+                            👤 {{ article.author.login if article.author else 'Неизвестен' }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if public_articles|length > 3 %}
+                <p style="text-align: center; margin-top: 1rem;">
+                    <a href="{{ url_for('lab8.articles_list') }}" style="color: #667eea; text-decoration: none;">
+                        Показать все публичные статьи ({{ public_articles|length }}) →
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+            {% elif not public_articles %}
+            <div class="no-articles" style="margin-top: 2rem;">
+                <p>Пока нет публичных статей. {% if username != 'anonymous' %}<a href="{{ url_for('lab8.create_article') }}" style="color: #667eea;">Создайте первую публичную статью!</a>{% endif %}</p>
+            </div>
+            {% endif %}
             
             {% if username != 'anonymous' and user_articles %}
             <div class="user-articles">
@@ -521,21 +606,31 @@
                 {% if user_articles|length > 3 %}
                 <p style="text-align: center; margin-top: 1rem;">
                     <a href="{{ url_for('lab8.articles_list') }}" style="color: #667eea; text-decoration: none;">
-                        Показать все статьи ({{ user_articles|length }}) →
+                        Показать все ваши статьи ({{ user_articles|length }}) →
                     </a>
                 </p>
                 {% endif %}
             </div>
             {% elif username != 'anonymous' %}
-            <div class="no-articles">
+            <div class="no-articles" style="margin-top: 2rem;">
                 <p>У вас пока нет статей. <a href="{{ url_for('lab8.create_article') }}" style="color: #667eea;">Создайте первую статью!</a></p>
             </div>
             {% endif %}
+            
+            <!-- Кнопка поиска -->
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="{{ url_for('lab8.search_articles') }}" class="search-link">
+                    🔍 Поиск по статьям
+                </a>
+            </div>
         </main>
 
         <footer class="footer">
             <p>© 2025 Лабораторная работа 8. Все права защищены.</p>
             <p>Система управления статьями | Flask + SQLAlchemy | Пользователь: {{ username }}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #888;">
+                🔍 Доступно поиска: {{ public_articles|length if public_articles else 0 }} публичных статей
+            </p>
         </footer>
     </div>
 

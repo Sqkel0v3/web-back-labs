@@ -162,6 +162,7 @@
             <p>Напишите новую статью</p>
         </div>
         
+        <!-- Флеш-сообщения -->
         <div class="flashes">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -173,3 +174,64 @@
                 {% endif %}
             {% endwith %}
         </div>
+        
+        {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <!-- ✅ ВОТ ФОРМА, КОТОРОЙ НЕ ХВАТАЛО -->
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Заголовок (макс. 50 символов):</label>
+                <input type="text" id="title" name="title" required 
+                       maxlength="50" value="{{ request.form.title if request.form }}">
+                <div class="char-counter">
+                    <span id="title-counter">0</span>/50
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="article_text">Текст статьи:</label>
+                <textarea id="article_text" name="article_text" required>{{ request.form.article_text if request.form }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_favorite" name="is_favorite" 
+                           {% if request.form and 'is_favorite' in request.form %}checked{% endif %}>
+                    <label for="is_favorite">Добавить в избранное</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_public" name="is_public" checked
+                           {% if not request.form or (request.form and 'is_public' in request.form) %}checked{% endif %}>
+                    <label for="is_public">Сделать статью публичной</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Опубликовать статью</button>
+        </form>
+        <!-- ✅ КОНЕЦ ФОРМЫ -->
+        
+        <div class="links">
+            <p><a href="{{ url_for('lab8.articles_list') }}">Посмотреть все статьи</a></p>
+            <p><a href="{{ url_for('lab8.index') }}">Вернуться на главную</a></p>
+        </div>
+    </div>
+    
+    <script>
+        const titleInput = document.getElementById('title');
+        const titleCounter = document.getElementById('title-counter');
+        
+        if (titleInput && titleCounter) {
+            titleInput.addEventListener('input', function() {
+                titleCounter.textContent = this.value.length;
+            });
+            
+            titleCounter.textContent = titleInput.value.length;
+        }
+    </script>
+</body>
+</html>

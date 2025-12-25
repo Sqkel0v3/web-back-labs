@@ -48,6 +48,12 @@
             color: #155724;
             border-color: #c3e6cb;
         }
+
+        .flash-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
         
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -86,10 +92,12 @@
             font-weight: 500;
             display: inline-block;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .btn:hover {
             background: #f8f9fa;
+            transform: translateY(-2px);
         }
         
         .btn-primary {
@@ -101,11 +109,21 @@
             background: #5a67d8;
         }
         
+        .btn-search {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-search:hover {
+            background: #218838;
+        }
+        
         .articles-section {
             background: white;
             padding: 1.5rem;
             border-radius: 10px;
             margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .articles-section h2 {
@@ -113,6 +131,27 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .section-count {
+            font-size: 0.9rem;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
         }
         
         .article-grid {
@@ -139,6 +178,7 @@
             color: #495057;
             margin-bottom: 0.5rem;
             font-size: 1.2rem;
+            line-height: 1.3;
         }
         
         .article-meta {
@@ -148,6 +188,7 @@
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
         }
         
         .article-text {
@@ -163,6 +204,8 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
         }
         
         .article-actions {
@@ -187,6 +230,9 @@
             border-radius: 3px;
             font-size: 0.8rem;
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
         }
         
         .badge-favorite {
@@ -204,16 +250,31 @@
             color: #721c24;
         }
         
+        .badge-own {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
         .likes-count {
             color: #e74c3c;
             font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
         }
         
         .no-articles {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem;
             color: #6c757d;
             font-style: italic;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .no-articles p {
+            margin-bottom: 1rem;
         }
         
         .navigation {
@@ -223,6 +284,43 @@
             justify-content: center;
             gap: 1rem;
             flex-wrap: wrap;
+        }
+        
+        .search-promo {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        .search-promo h3 {
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+        
+        .search-promo p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .article-author {
+            font-size: 0.85rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .article-id {
+            font-size: 0.8rem;
+            color: #999;
+            background: #f8f9fa;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
         }
         
         @media (max-width: 768px) {
@@ -237,6 +335,15 @@
             
             .user-info {
                 justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .article-actions {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -258,25 +365,37 @@
     <div class="container">
         <header class="header">
             <div class="header-content">
-                <h1>Статьи</h1>
+                <h1>📰 Статьи</h1>
                 <div class="user-info">
                     {% if session['user_id'] %}
-                        <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать статью</a>
-                        <a href="{{ url_for('lab8.favorites') }}" class="btn">Избранное</a>
-                        <a href="{{ url_for('lab8.index') }}" class="btn">На главную</a>
-                        <a href="{{ url_for('lab8.logout') }}" class="btn">Выйти</a>
+                        <a href="{{ url_for('lab8.search_articles') }}" class="btn btn-search">🔍 Поиск</a>
+                        <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">✏️ Создать</a>
+                        <a href="{{ url_for('lab8.favorites') }}" class="btn">⭐ Избранное</a>
+                        <a href="{{ url_for('lab8.index') }}" class="btn">🏠 Главная</a>
+                        <a href="{{ url_for('lab8.logout') }}" class="btn">🚪 Выйти</a>
                     {% else %}
-                        <a href="{{ url_for('lab8.login') }}" class="btn">Войти</a>
-                        <a href="{{ url_for('lab8.register') }}" class="btn">Регистрация</a>
-                        <a href="{{ url_for('lab8.index') }}" class="btn">На главную</a>
+                        <a href="{{ url_for('lab8.search_articles') }}" class="btn btn-search">🔍 Поиск статей</a>
+                        <a href="{{ url_for('lab8.login') }}" class="btn">🔐 Войти</a>
+                        <a href="{{ url_for('lab8.register') }}" class="btn">📝 Регистрация</a>
+                        <a href="{{ url_for('lab8.index') }}" class="btn">🏠 Главная</a>
                     {% endif %}
                 </div>
             </div>
         </header>
         
+        <div class="search-promo">
+            <h3>🔍 Ищете что-то конкретное?</h3>
+            <p>Воспользуйтесь поиском по статьям! Поиск работает по заголовкам и тексту статей, регистронезависимый.</p>
+            <a href="{{ url_for('lab8.search_articles') }}" class="btn btn-search">Перейти к поиску статей</a>
+        </div>
+        
         {% if user_articles %}
         <section class="articles-section">
-            <h2>Мои статьи</h2>
+            <div class="section-header">
+                <h2>📁 Мои статьи</h2>
+                <span class="section-count">{{ user_articles|length }} статей</span>
+            </div>
+            
             {% if user_articles %}
             <div class="article-grid">
                 {% for article in user_articles %}
@@ -295,13 +414,16 @@
                     </div>
                     <p class="article-text">{{ article.article_text[:150] }}{% if article.article_text|length > 150 %}...{% endif %}</p>
                     <div class="article-footer">
-                        <small>ID: {{ article.id }}</small>
+                        <div class="article-author">
+                            <span class="article-id">#{{ article.id }}</span>
+                            <span>👤 Вы</span>
+                        </div>
                         <div class="article-actions">
-                            <a href="{{ url_for('lab8.edit_article', article_id=article.id) }}" class="btn">✏️</a>
+                            <a href="{{ url_for('lab8.edit_article', article_id=article.id) }}" class="btn" title="Редактировать">✏️</a>
                             <form action="{{ url_for('lab8.delete_article', article_id=article.id) }}" method="POST" style="display: inline;">
-                                <button type="submit" class="btn" onclick="return confirm('Удалить статью?')">🗑️</button>
+                                <button type="submit" class="btn" title="Удалить" onclick="return confirm('Удалить статью?')">🗑️</button>
                             </form>
-                            <a href="{{ url_for('lab8.like_article', article_id=article.id) }}" class="btn">👍</a>
+                            <a href="{{ url_for('lab8.like_article', article_id=article.id) }}" class="btn" title="Лайк">👍</a>
                         </div>
                     </div>
                 </div>
@@ -310,13 +432,18 @@
             {% else %}
             <div class="no-articles">
                 <p>У вас пока нет статей</p>
+                <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать первую статью</a>
             </div>
             {% endif %}
         </section>
         {% endif %}
         
         <section class="articles-section">
-            <h2>Публичные статьи</h2>
+            <div class="section-header">
+                <h2>🌐 Публичные статьи</h2>
+                <span class="section-count">{{ public_articles|length }} статей</span>
+            </div>
+            
             {% if public_articles %}
             <div class="article-grid">
                 {% for article in public_articles %}
@@ -326,13 +453,25 @@
                         {% if article.is_favorite %}
                         <span class="badge badge-favorite">★ Избранная</span>
                         {% endif %}
+                        {% if article.login_id == session.get('user_id') %}
+                        <span class="badge badge-own">👤 Ваша</span>
+                        {% endif %}
                         <span class="likes-count">❤️ {{ article.likes }}</span>
                     </div>
                     <p class="article-text">{{ article.article_text[:150] }}{% if article.article_text|length > 150 %}...{% endif %}</p>
                     <div class="article-footer">
-                        <small>Автор: {{ article.author.login if article.author else 'Неизвестен' }}</small>
+                        <div class="article-author">
+                            <span class="article-id">#{{ article.id }}</span>
+                            <span>👤 {{ article.author.login if article.author else 'Неизвестен' }}</span>
+                        </div>
                         <div class="article-actions">
-                            <a href="{{ url_for('lab8.like_article', article_id=article.id) }}" class="btn">👍 {{ article.likes }}</a>
+                            {% if session['user_id'] and article.login_id == session['user_id'] %}
+                                <a href="{{ url_for('lab8.edit_article', article_id=article.id) }}" class="btn" title="Редактировать">✏️</a>
+                                <form action="{{ url_for('lab8.delete_article', article_id=article.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn" title="Удалить" onclick="return confirm('Удалить статью?')">🗑️</button>
+                                </form>
+                            {% endif %}
+                            <a href="{{ url_for('lab8.like_article', article_id=article.id) }}" class="btn" title="Лайк">👍 {{ article.likes }}</a>
                         </div>
                     </div>
                 </div>
@@ -341,14 +480,22 @@
             {% else %}
             <div class="no-articles">
                 <p>Пока нет публичных статей</p>
+                {% if session['user_id'] %}
+                <p><a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создайте первую публичную статью!</a></p>
+                {% else %}
+                <p><a href="{{ url_for('lab8.register') }}" class="btn btn-primary">Зарегистрируйтесь, чтобы создавать статьи</a></p>
+                {% endif %}
             </div>
             {% endif %}
         </section>
         
         <div class="navigation">
-            <a href="{{ url_for('lab8.index') }}" class="btn">На главную</a>
+            <a href="{{ url_for('lab8.index') }}" class="btn">🏠 На главную</a>
+            <a href="{{ url_for('lab8.search_articles') }}" class="btn btn-search">🔍 Поиск статей</a>
             {% if session['user_id'] %}
-            <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">Создать статью</a>
+            <a href="{{ url_for('lab8.create_article') }}" class="btn btn-primary">✏️ Создать статью</a>
+            {% else %}
+            <a href="{{ url_for('lab8.register') }}" class="btn btn-primary">📝 Зарегистрироваться</a>
             {% endif %}
         </div>
     </div>
@@ -363,6 +510,18 @@
                         e.preventDefault();
                     }
                 });
+            });
+            
+            const cards = document.querySelectorAll('.article-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
             });
         });
     </script>
